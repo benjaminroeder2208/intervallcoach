@@ -94,7 +94,7 @@ function AuthCard({ children }) {
     style: { minHeight: "100vh", background: "var(--bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }
   }, React.createElement("div", {
     className: "auth-card",
-    style: { width: "100%", maxWidth: 400, background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: 20, padding: "32px 28px" }
+    style: { width: "100%", maxWidth: 400, background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: 4, padding: "32px 28px" }
   }, children));
 }
 
@@ -195,18 +195,18 @@ function AuthScreen({ onLogin }) {
 
   const inputStyle = {
     width: "100%", boxSizing: "border-box", background: "var(--bg4)",
-    border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)",
+    border: "1px solid var(--border)", borderRadius: 4, color: "var(--text)",
     fontSize: 16, fontFamily: "inherit", padding: "14px", outline: "none", marginBottom: 12
   };
   const btnPrimary = {
-    width: "100%", padding: "16px", borderRadius: 14, border: "none",
-    background: "#22c55e", color: "#fff", fontSize: 16, fontWeight: 800,
+    width: "100%", padding: "16px", borderRadius: 4, border: "none",
+    background: "#f97316", color: "#fff", fontSize: 16, fontWeight: 800,
     fontFamily: "inherit", cursor: loading ? "default" : "pointer",
     letterSpacing: 1, opacity: loading ? 0.7 : 1, marginTop: 4
   };
 
   const ErrorBox = ({ msg }) => msg ? React.createElement("div", {
-    style: { color: "#f97316", fontSize: 14, marginBottom: 12, padding: "10px 12px", background: "var(--del-bg)", borderRadius: 8, border: "1px solid var(--del-border)" }
+    style: { color: "#f97316", fontSize: 14, marginBottom: 12, padding: "10px 12px", background: "var(--del-bg)", borderRadius: 4, border: "1px solid var(--del-border)" }
   }, msg) : null;
 
   // ── Registered: check email ───────────────────────────────────────────────
@@ -223,11 +223,11 @@ function AuthScreen({ onLogin }) {
           try { await apiRequest("POST", "/auth/resend-verification", { email }); alert("E-Mail erneut gesendet!"); }
           catch (e) { alert(e.message); }
         },
-        style: { width: "100%", padding: "12px", borderRadius: 12, border: "1px solid var(--border)", background: "none", color: "var(--text3)", fontSize: 14, fontFamily: "inherit", cursor: "pointer", marginBottom: 8 }
+        style: { width: "100%", padding: "12px", borderRadius: 4, border: "1px solid var(--border)", background: "none", color: "var(--text3)", fontSize: 14, fontFamily: "inherit", cursor: "pointer", marginBottom: 8 }
       }, "E-Mail erneut senden"),
       React.createElement("button", {
         onClick: () => { setMode("login"); setError(""); },
-        style: { width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "var(--bg3)", color: "var(--text2)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }
+        style: { width: "100%", padding: "12px", borderRadius: 4, border: "none", background: "var(--bg3)", color: "var(--text2)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" }
       }, "Zur Anmeldung")
     );
   }
@@ -268,7 +268,7 @@ function AuthScreen({ onLogin }) {
       React.createElement("input", { type: "email", placeholder: "E-Mail", value: email, onChange: e => setEmail(e.target.value), onKeyDown: e => e.key === "Enter" && handleSubmit(), style: inputStyle }),
       React.createElement(ErrorBox, { msg: error }),
       React.createElement("button", { onClick: handleSubmit, disabled: loading, style: btnPrimary }, loading ? "..." : "Reset-Link senden"),
-      React.createElement("button", { onClick: () => { setMode("login"); setError(""); }, style: { width: "100%", padding: "12px", borderRadius: 12, border: "none", background: "none", color: "var(--text3)", fontSize: 14, fontFamily: "inherit", cursor: "pointer", marginTop: 8 } }, "Zurueck zur Anmeldung")
+      React.createElement("button", { onClick: () => { setMode("login"); setError(""); }, style: { width: "100%", padding: "12px", borderRadius: 4, border: "none", background: "none", color: "var(--text3)", fontSize: 14, fontFamily: "inherit", cursor: "pointer", marginTop: 8 } }, "Zurueck zur Anmeldung")
     );
   }
 
@@ -287,10 +287,10 @@ function AuthScreen({ onLogin }) {
   // ── Login / Register ──────────────────────────────────────────────────────
   return React.createElement(AuthCard, null,
     React.createElement(AuthLogo, null),
-    React.createElement("div", { style: { display: "flex", background: "var(--bg3)", borderRadius: 10, padding: 3, marginBottom: 24, border: "1px solid var(--border)" } },
+    React.createElement("div", { style: { display: "flex", background: "var(--bg3)", borderRadius: 4, padding: 3, marginBottom: 24, border: "1px solid var(--border)" } },
       ["login", "register"].map(m =>
         React.createElement("button", { key: m, onClick: () => { setMode(m); setError(""); setPassword(""); setPassword2(""); },
-          style: { flex: 1, padding: "10px", borderRadius: 8, border: "none", background: mode === m ? "var(--bg2)" : "transparent", color: mode === m ? "var(--text)" : "var(--text3)", fontFamily: "inherit", fontSize: 14, fontWeight: mode === m ? 700 : 400, cursor: "pointer", transition: "all 0.2s" }
+          style: { flex: 1, padding: "10px", borderRadius: 4, border: "none", background: mode === m ? "var(--bg2)" : "transparent", color: mode === m ? "var(--text)" : "var(--text3)", fontFamily: "inherit", fontSize: 14, fontWeight: mode === m ? 700 : 400, cursor: "pointer", transition: "all 0.2s" }
         }, m === "login" ? "Anmelden" : "Registrieren")
       )
     ),
@@ -299,7 +299,7 @@ function AuthScreen({ onLogin }) {
     React.createElement("input", { type: "password", placeholder: "Passwort", value: password, onChange: e => setPassword(e.target.value), onKeyDown: e => e.key === "Enter" && handleSubmit(), style: { ...inputStyle, marginBottom: mode === "register" ? 12 : 4 } }),
     mode === "register" && React.createElement("input", { type: "password", placeholder: "Passwort wiederholen", value: password2, onChange: e => setPassword2(e.target.value), onKeyDown: e => e.key === "Enter" && handleSubmit(), style: inputStyle }),
     mode === "register" && React.createElement("label", {
-      style: { display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", marginBottom: 12, padding: "12px 14px", borderRadius: 10, background: agbAccepted ? "var(--bg3)" : "var(--bg4)", border: agbAccepted ? "1px solid #22c55e44" : "1px solid var(--border)" }
+      style: { display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", marginBottom: 12, padding: "12px 14px", borderRadius: 4, background: agbAccepted ? "var(--bg3)" : "var(--bg4)", border: agbAccepted ? "1px solid #22c55e44" : "1px solid var(--border)" }
     },
       React.createElement("input", {
         type: "checkbox", checked: agbAccepted, onChange: e => setAgbAccepted(e.target.checked),
@@ -316,7 +316,7 @@ function AuthScreen({ onLogin }) {
     mode === "login" && React.createElement("div", { style: { textAlign: "right", marginBottom: 12 } },
       React.createElement("button", { onClick: () => { setMode("forgot"); setError(""); }, style: { background: "none", border: "none", color: "var(--text3)", fontSize: 13, cursor: "pointer", fontFamily: "inherit", padding: 0 } }, "Passwort vergessen?")
     ),
-    unverifiedEmail && mode === "login" && React.createElement("div", { style: { fontSize: 13, color: "#eab308", marginBottom: 12, padding: "10px 12px", background: "var(--bg3)", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" } },
+    unverifiedEmail && mode === "login" && React.createElement("div", { style: { fontSize: 13, color: "#eab308", marginBottom: 12, padding: "10px 12px", background: "var(--bg3)", borderRadius: 4, display: "flex", justifyContent: "space-between", alignItems: "center" } },
       React.createElement("span", null, "E-Mail noch nicht bestaetigt."),
       React.createElement("button", {
         onClick: async () => { try { await apiRequest("POST", "/auth/resend-verification", { email: unverifiedEmail }); alert("E-Mail gesendet!"); } catch(e) { alert(e.message); } },
@@ -1056,10 +1056,10 @@ function FitnessTimer({ user, onLogout }) {
 
   const S = {
     text: { color: "var(--text)" }, text2: { color: "var(--text2)" }, text3: { color: "var(--text3)" }, text4: { color: "var(--text4)" },
-    card: { background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: 14 },
-    inner: { background: "var(--bg4)", borderRadius: 10 }
+    card: { background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: 4 },
+    inner: { background: "var(--bg4)", borderRadius: 4 }
   };
-  const btnBase = { width: 44, height: 44, borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg3)", color: "var(--text)", cursor: "pointer", fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, fontFamily: "inherit", flexShrink: 0 };
+  const btnBase = { width: 44, height: 44, borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg3)", color: "var(--text)", cursor: "pointer", fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1, fontFamily: "inherit", flexShrink: 0 };
 
   function NumInput({ value, onChange, min, max, unit }) {
     return React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, flexShrink: 0 } },
@@ -1074,8 +1074,8 @@ function FitnessTimer({ user, onLogout }) {
 
   function ThemeToggle() {
     const opts = [{ v: "system", icon: "🌐" }, { v: "dark", icon: "🌙" }, { v: "light", icon: "☀️" }];
-    return React.createElement("div", { style: { display: "flex", gap: 4, background: "var(--bg3)", borderRadius: 10, padding: 3, border: "1px solid var(--border)" } },
-      opts.map(o => React.createElement("button", { key: o.v, onClick: () => setThemePref(o.v), style: { width: 34, height: 30, borderRadius: 7, border: "none", cursor: "pointer", fontSize: 14, background: themePref === o.v ? "var(--bg2)" : "transparent", boxShadow: themePref === o.v ? dark ? "0 1px 4px #00000066" : "0 1px 4px #00000022" : "none", transition: "all 0.2s", fontFamily: "inherit" } }, o.icon))
+    return React.createElement("div", { style: { display: "flex", gap: 4, background: "var(--bg3)", borderRadius: 4, padding: 3, border: "1px solid var(--border)" } },
+      opts.map(o => React.createElement("button", { key: o.v, onClick: () => setThemePref(o.v), style: { width: 34, height: 30, borderRadius: 4, border: "none", cursor: "pointer", fontSize: 14, background: themePref === o.v ? "var(--bg2)" : "transparent", boxShadow: themePref === o.v ? dark ? "0 1px 4px #00000066" : "0 1px 4px #00000022" : "none", transition: "all 0.2s", fontFamily: "inherit" } }, o.icon))
     );
   }
 
@@ -1102,14 +1102,14 @@ function FitnessTimer({ user, onLogout }) {
         syncStatus === "saved" && React.createElement("div", { style: { fontSize: 12, color: "#22c55e", letterSpacing: 1 } }, "✓"),
         syncStatus === "error" && React.createElement("div", { style: { fontSize: 12, color: "#f97316" } }, "⚠"),
         // Streak
-        (() => { const streak = calcStreak(history); if(streak < 1) return null; return React.createElement("div", { title: `${streak} Tage Streak`, style: { display: "flex", alignItems: "center", gap: 4, background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: 10, padding: "5px 10px", fontSize: 14, fontWeight: 800, color: "#f97316" } }, "🔥", streak); })(),
+        (() => { const streak = calcStreak(history); if(streak < 1) return null; return React.createElement("div", { title: `${streak} Tage Streak`, style: { display: "flex", alignItems: "center", gap: 4, background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: 4, padding: "5px 10px", fontSize: 14, fontWeight: 800, color: "#f97316" } }, "🔥", streak); })(),
         isRunning && React.createElement("div", { style: { fontSize: 18 } }, wakeLockStatus === "active" ? "🔆" : wakeLockStatus === "denied" ? "⚠️" : ""),
         React.createElement(ThemeToggle, null),
         // User menu
         React.createElement("button", {
           onClick: onLogout,
           title: `Abmelden (${user.email})`,
-          style: { background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text3)", cursor: "pointer", fontSize: 13, padding: "6px 10px", fontFamily: "inherit" }
+          style: { background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text3)", cursor: "pointer", fontSize: 13, padding: "6px 10px", fontFamily: "inherit" }
         }, "↩")
       )
     ),
@@ -1119,7 +1119,7 @@ function FitnessTimer({ user, onLogout }) {
       TABS.map(t => React.createElement("button", {
         key: t.id,
         onClick: () => { setTab(t.id); if (t.id === "config") setEditConfig({ ...config, items: config.items.map((i, idx) => ({ _id: i._id || `item-${Date.now()}-${idx}`, ...i })) }); },
-        style: { flex: 1, padding: "10px 2px", borderRadius: 10, border: `1px solid ${tab === t.id ? "transparent" : "var(--border2)"}`, cursor: "pointer", fontSize: 14, letterSpacing: 0.5, textTransform: "uppercase", background: tab === t.id ? phaseColor : "var(--bg2)", color: tab === t.id ? "#fff" : "var(--text3)", fontFamily: "inherit", transition: "all 0.2s", fontWeight: tab === t.id ? 700 : 400 }
+        style: { flex: 1, padding: "10px 2px", borderRadius: 4, border: `1px solid ${tab === t.id ? "transparent" : "var(--border2)"}`, cursor: "pointer", fontSize: 14, letterSpacing: 0.5, textTransform: "uppercase", background: tab === t.id ? phaseColor : "var(--bg2)", color: tab === t.id ? "#fff" : "var(--text3)", fontFamily: "inherit", transition: "all 0.2s", fontWeight: tab === t.id ? 700 : 400 }
       }, t.label))
     ),
 
@@ -1159,26 +1159,26 @@ function FitnessTimer({ user, onLogout }) {
           )
         )
       ),
-      isRunning && (phase === PHASES.WORK || phase === PHASES.REST || phase === PHASES.EX_BREAK || phase === PHASES.ROUND_REST) && nextExStep && React.createElement("div", { style: { width: "100%", padding: "10px 14px", borderRadius: 10, background: "var(--bg3)", border: `1px solid var(--border2)`, display: "flex", alignItems: "center", gap: 10 } },
+      isRunning && (phase === PHASES.WORK || phase === PHASES.REST || phase === PHASES.EX_BREAK || phase === PHASES.ROUND_REST) && nextExStep && React.createElement("div", { style: { width: "100%", padding: "10px 14px", borderRadius: 4, background: "var(--bg3)", border: `1px solid var(--border2)`, display: "flex", alignItems: "center", gap: 10 } },
         React.createElement("div", { style: { fontSize: 15, ...S.text3, letterSpacing: 1, textTransform: "uppercase", flexShrink: 0 } }, "Nächste:"),
         React.createElement("div", { style: { flex: 1, fontSize: 14, fontWeight: 700, color: phaseColor } }, nextExStep.name),
         React.createElement("div", { style: { fontSize: 14, color: "#f97316" } }, nextExStep.workSec, "s × ", nextExStep.sets)
       ),
-      config.youtubeUrl && youtubeEmbedUrl(config.youtubeUrl) && React.createElement("div", { style: { width: "100%", borderRadius: 14, overflow: "hidden", border: "1px solid var(--border2)", background: "#000", aspectRatio: "16/9" } },
+      config.youtubeUrl && youtubeEmbedUrl(config.youtubeUrl) && React.createElement("div", { style: { width: "100%", borderRadius: 4, overflow: "hidden", border: "1px solid var(--border2)", background: "#000", aspectRatio: "16/9" } },
         React.createElement("iframe", { src: youtubeEmbedUrl(config.youtubeUrl), style: { width: "100%", height: "100%", border: "none", display: "block" }, allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture", allowFullScreen: true })
       ),
       (phase === PHASES.WORK || phase === PHASES.REST || phase === PHASES.EX_BREAK || phase === PHASES.IDLE) && React.createElement("div", { style: { width: "100%", display: "flex", flexDirection: "column", gap: 5 } },
         seq.map((step, i) => {
           if (step.kind === "break") {
             const isActive = i === seqIdx && isRunning;
-            return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "5px 14px", borderRadius: 8, background: isActive ? "var(--bg3)" : "transparent", border: `1px dashed ${isActive ? "#a855f7" : "var(--border2)"}`, opacity: i < seqIdx ? 0.25 : 1, transition: "all 0.3s" } },
+            return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "5px 14px", borderRadius: 4, background: isActive ? "var(--bg3)" : "transparent", border: `1px dashed ${isActive ? "#a855f7" : "var(--border2)"}`, opacity: i < seqIdx ? 0.25 : 1, transition: "all 0.3s" } },
               React.createElement("div", { style: { fontSize: 10, ...S.text3, flex: 1, letterSpacing: 1 } }, "— PAUSE —"),
               React.createElement("div", { style: { fontSize: 10, color: "#a855f7", fontWeight: 600 } }, step.durationSec, "s")
             );
           }
           const isActive = i === seqIdx && isRunning && (phase === PHASES.WORK || phase === PHASES.REST);
           const isDone = i < seqIdx && phase !== PHASES.IDLE;
-          return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", borderRadius: 10, background: isActive ? "var(--bg3)" : "var(--bg2)", border: `1px solid ${isActive ? phaseColor + "88" : "var(--border2)"}`, transition: "all 0.3s", opacity: isDone ? 0.3 : 1 } },
+          return React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", borderRadius: 4, background: isActive ? "var(--bg3)" : "var(--bg2)", border: `1px solid ${isActive ? phaseColor + "88" : "var(--border2)"}`, transition: "all 0.3s", opacity: isDone ? 0.3 : 1 } },
             React.createElement("div", { style: { width: 7, height: 7, borderRadius: "50%", flexShrink: 0, background: isActive ? phaseColor : isDone ? "var(--border)" : "var(--border2)" } }),
             React.createElement("div", { style: { flex: 1, fontSize: 15, fontWeight: isActive ? 700 : 400, ...(isActive ? { color: phaseColor } : S.text) } }, step.name),
             React.createElement("div", { style: { fontSize: 14, color: "#f97316", fontWeight: 600 } }, step.workSec, "s"),
@@ -1191,18 +1191,18 @@ function FitnessTimer({ user, onLogout }) {
           );
         })
       ),
-      wakeLockStatus === "denied" && isRunning && React.createElement("div", { style: { width: "100%", padding: "8px 14px", borderRadius: 10, background: "var(--del-bg)", border: "1px solid var(--del-border)", fontSize: 14, color: "#f97316" } }, "⚠️ Wake Lock nicht verfügbar — Bildschirm kann ausgehen."),
+      wakeLockStatus === "denied" && isRunning && React.createElement("div", { style: { width: "100%", padding: "8px 14px", borderRadius: 4, background: "var(--del-bg)", border: "1px solid var(--del-border)", fontSize: 14, color: "#f97316" } }, "⚠️ Wake Lock nicht verfügbar — Bildschirm kann ausgehen."),
       React.createElement("div", { style: { display: "flex", gap: 10, width: "100%" } },
         phase === PHASES.IDLE || phase === PHASES.DONE
           ? React.createElement(React.Fragment, null,
-              React.createElement("button", { onClick: handleStart, style: { flex: 1, padding: "18px", borderRadius: 14, border: "none", background: phaseColor, color: "#fff", fontSize: 16, fontWeight: 800, fontFamily: "inherit", cursor: "pointer", letterSpacing: 2, textTransform: "uppercase", boxShadow: `0 4px 20px ${phaseColor}55` } }, phase === PHASES.DONE ? "↺ Nochmal" : "▶ Start"),
-              React.createElement("button", { onClick: () => setSoundEnabled(s => !s), title: soundEnabled ? "Ton aus" : "Ton an", style: { padding: "18px 16px", borderRadius: 14, border: `1px solid ${soundEnabled ? "var(--border)" : "#f97316"}`, background: soundEnabled ? "var(--bg2)" : "var(--del-bg)", fontSize: 18, fontFamily: "inherit", cursor: "pointer" } }, soundEnabled ? "🔊" : "🔇")
+              React.createElement("button", { onClick: handleStart, style: { flex: 1, padding: "18px", borderRadius: 4, border: "none", background: phaseColor, color: "#fff", fontSize: 16, fontWeight: 800, fontFamily: "inherit", cursor: "pointer", letterSpacing: 2, textTransform: "uppercase", boxShadow: `0 4px 20px ${phaseColor}55` } }, phase === PHASES.DONE ? "↺ Nochmal" : "▶ Start"),
+              React.createElement("button", { onClick: () => setSoundEnabled(s => !s), title: soundEnabled ? "Ton aus" : "Ton an", style: { padding: "18px 16px", borderRadius: 4, border: `1px solid ${soundEnabled ? "var(--border)" : "#f97316"}`, background: soundEnabled ? "var(--bg2)" : "var(--del-bg)", fontSize: 18, fontFamily: "inherit", cursor: "pointer" } }, soundEnabled ? "🔊" : "🔇")
             )
           : React.createElement(React.Fragment, null,
-              React.createElement("button", { onClick: handlePause, style: { flex: 1, padding: "16px", borderRadius: 14, border: `2px solid ${phaseColor}`, background: isPaused ? phaseColor : "transparent", color: isPaused ? "#fff" : phaseColor, fontSize: 15, fontWeight: 800, fontFamily: "inherit", cursor: "pointer", letterSpacing: 1, textTransform: "uppercase" } }, isPaused ? "▶ Weiter" : "⏸ Pause"),
-              React.createElement("button", { onClick: handleSkip, title: "Phase überspringen", style: { padding: "16px 14px", borderRadius: 14, border: "1px solid var(--border)", background: "var(--bg2)", ...S.text3, fontSize: 18, fontFamily: "inherit", cursor: "pointer" } }, "⏭"),
-              React.createElement("button", { onClick: () => setSoundEnabled(s => !s), title: soundEnabled ? "Ton aus" : "Ton an", style: { padding: "16px 14px", borderRadius: 14, border: `1px solid ${soundEnabled ? "var(--border)" : "#f97316"}`, background: soundEnabled ? "var(--bg2)" : "var(--del-bg)", fontSize: 18, fontFamily: "inherit", cursor: "pointer" } }, soundEnabled ? "🔊" : "🔇"),
-              React.createElement("button", { onClick: handleReset, title: "Zurücksetzen", style: { padding: "16px 14px", borderRadius: 14, border: "1px solid var(--border)", background: "var(--bg2)", ...S.text3, fontSize: 18, fontFamily: "inherit", cursor: "pointer" } }, "↺")
+              React.createElement("button", { onClick: handlePause, style: { flex: 1, padding: "16px", borderRadius: 4, border: `2px solid ${phaseColor}`, background: isPaused ? phaseColor : "transparent", color: isPaused ? "#fff" : phaseColor, fontSize: 15, fontWeight: 800, fontFamily: "inherit", cursor: "pointer", letterSpacing: 1, textTransform: "uppercase" } }, isPaused ? "▶ Weiter" : "⏸ Pause"),
+              React.createElement("button", { onClick: handleSkip, title: "Phase überspringen", style: { padding: "16px 14px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg2)", ...S.text3, fontSize: 18, fontFamily: "inherit", cursor: "pointer" } }, "⏭"),
+              React.createElement("button", { onClick: () => setSoundEnabled(s => !s), title: soundEnabled ? "Ton aus" : "Ton an", style: { padding: "16px 14px", borderRadius: 4, border: `1px solid ${soundEnabled ? "var(--border)" : "#f97316"}`, background: soundEnabled ? "var(--bg2)" : "var(--del-bg)", fontSize: 18, fontFamily: "inherit", cursor: "pointer" } }, soundEnabled ? "🔊" : "🔇"),
+              React.createElement("button", { onClick: handleReset, title: "Zurücksetzen", style: { padding: "16px 14px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg2)", ...S.text3, fontSize: 18, fontFamily: "inherit", cursor: "pointer" } }, "↺")
             )
       )
     ),
@@ -1228,8 +1228,8 @@ function FitnessTimer({ user, onLogout }) {
               editConfig.youtubeUrl && (youtubeEmbedUrl(editConfig.youtubeUrl) ? React.createElement("span", { style: { fontSize: 14, color: "#22c55e" } }, "✓ Gültig") : React.createElement("span", { style: { fontSize: 14, color: "#f97316" } }, "⚠ Ungültig"))
             ),
             React.createElement("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
-              React.createElement("input", { value: editConfig.youtubeUrl || "", onChange: e => setEditConfig(c => ({ ...c, youtubeUrl: e.target.value })), placeholder: "https://youtu.be/... (optional)", style: { flex: 1, background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 14, fontFamily: "inherit", padding: "12px", outline: "none" } }),
-              editConfig.youtubeUrl && React.createElement("button", { onClick: () => setEditConfig(c => ({ ...c, youtubeUrl: "" })), style: { background: "var(--del-bg)", border: "1px solid var(--del-border)", borderRadius: 8, color: "#f97316", cursor: "pointer", fontSize: 14, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, "✕")
+              React.createElement("input", { value: editConfig.youtubeUrl || "", onChange: e => setEditConfig(c => ({ ...c, youtubeUrl: e.target.value })), placeholder: "https://youtu.be/... (optional)", style: { flex: 1, background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text)", fontSize: 14, fontFamily: "inherit", padding: "12px", outline: "none" } }),
+              editConfig.youtubeUrl && React.createElement("button", { onClick: () => setEditConfig(c => ({ ...c, youtubeUrl: "" })), style: { background: "var(--del-bg)", border: "1px solid var(--del-border)", borderRadius: 4, color: "#f97316", cursor: "pointer", fontSize: 14, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, "✕")
             )
           )
         )
@@ -1238,12 +1238,12 @@ function FitnessTimer({ user, onLogout }) {
         React.createElement("div", { style: { fontSize: 14, letterSpacing: 3, textTransform: "uppercase", marginBottom: 12, ...S.text3 } }, "Übungen & Pausen ", React.createElement("span", { style: { fontSize: 11, color: "#a855f7", marginLeft: 6 } }, "DRAG TO REORDER")),
         editConfig.items.map((item, idx) => {
           if (item.type === "break") {
-            return React.createElement("div", { key: item._id || idx, draggable: true, onDragStart: () => onDragStart(idx), onDragOver: e => { e.preventDefault(); e.currentTarget.classList.add("drag-over"); }, onDragLeave: e => e.currentTarget.classList.remove("drag-over"), onDrop: e => { e.currentTarget.classList.remove("drag-over"); onDrop(idx); }, style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "10px 14px", borderRadius: 10, ...S.card, border: "1px dashed var(--border)", cursor: "grab" } },
+            return React.createElement("div", { key: item._id || idx, draggable: true, onDragStart: () => onDragStart(idx), onDragOver: e => { e.preventDefault(); e.currentTarget.classList.add("drag-over"); }, onDragLeave: e => e.currentTarget.classList.remove("drag-over"), onDrop: e => { e.currentTarget.classList.remove("drag-over"); onDrop(idx); }, style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "10px 14px", borderRadius: 4, ...S.card, border: "1px dashed var(--border)", cursor: "grab" } },
               React.createElement("div", { style: { fontSize: 16, cursor: "grab", ...S.text3 } }, "⠿"),
               React.createElement("div", { style: { fontSize: 18 } }, "☕"),
               React.createElement("div", { style: { flex: 1, fontSize: 15, ...S.text3, letterSpacing: 1, textTransform: "uppercase" } }, "Pause"),
               React.createElement(NumInput, { value: item.durationSec, min: 5, max: 300, unit: "s", onChange: v => updateItem(idx, "durationSec", v) }),
-              React.createElement("button", { onClick: () => removeItem(idx), style: { background: "var(--del-bg)", border: "1px solid var(--del-border)", borderRadius: 8, color: "#f97316", cursor: "pointer", fontSize: 14, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, "✕")
+              React.createElement("button", { onClick: () => removeItem(idx), style: { background: "var(--del-bg)", border: "1px solid var(--del-border)", borderRadius: 4, color: "#f97316", cursor: "pointer", fontSize: 14, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, "✕")
             );
           }
           const hasBreakAfter = editConfig.items[idx + 1]?.type === "break";
@@ -1252,8 +1252,8 @@ function FitnessTimer({ user, onLogout }) {
               React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
                 React.createElement("div", { style: { fontSize: 16, ...S.text3, marginRight: 8, cursor: "grab" } }, "⠿"),
                 React.createElement("input", { value: item.name, onChange: e => updateItem(idx, "name", e.target.value), draggable: false, onDragStart: e => e.preventDefault(), style: { background: "transparent", border: "none", borderBottom: "2px solid var(--border)", color: "var(--text)", fontSize: 17, fontFamily: "inherit", fontWeight: 700, flex: 1, outline: "none", padding: "4px 0", marginRight: 8 } }),
-                React.createElement("button", { onClick: () => duplicateItem(idx), title: "Duplizieren", style: { background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text3)", cursor: "pointer", fontSize: 14, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginRight: 4 } }, "⊙"),
-                React.createElement("button", { onClick: () => removeItem(idx), style: { background: "var(--del-bg)", border: "1px solid var(--del-border)", borderRadius: 8, color: "#f97316", cursor: "pointer", fontSize: 14, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, "✕")
+                React.createElement("button", { onClick: () => duplicateItem(idx), title: "Duplizieren", style: { background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text3)", cursor: "pointer", fontSize: 14, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginRight: 4 } }, "⊙"),
+                React.createElement("button", { onClick: () => removeItem(idx), style: { background: "var(--del-bg)", border: "1px solid var(--del-border)", borderRadius: 4, color: "#f97316", cursor: "pointer", fontSize: 14, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, "✕")
               ),
               [["Sätze", "#22c55e", item.sets, 1, 30, v => updateItem(idx, "sets", v), undefined], ["Dauer", "#f97316", item.workSec, 5, 600, v => updateItem(idx, "workSec", v), "s"], ["Pause", "#0ea5e9", item.restSec, 0, 300, v => updateItem(idx, "restSec", v), "s"]].map(([label, color, val, min, max, onChange, unit], ri) =>
                 React.createElement("div", { key: label, style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: ri < 2 ? 8 : 0, ...S.inner, padding: "12px 14px" } },
@@ -1261,18 +1261,18 @@ function FitnessTimer({ user, onLogout }) {
                   React.createElement(NumInput, { value: val, min, max, onChange, unit })
                 )
               ),
-              React.createElement("button", { onClick: () => updateItem(idx, "halfTimeSignal", !item.halfTimeSignal), style: { width: "100%", marginTop: 8, padding: "10px 12px", borderRadius: 10, border: `1px solid ${item.halfTimeSignal ? "#0ea5e988" : "var(--border)"}`, background: item.halfTimeSignal ? "var(--bg3)" : "transparent", color: item.halfTimeSignal ? "#0ea5e9" : "var(--text3)", fontSize: 13, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontWeight: item.halfTimeSignal ? 700 : 400 } },
+              React.createElement("button", { onClick: () => updateItem(idx, "halfTimeSignal", !item.halfTimeSignal), style: { width: "100%", marginTop: 8, padding: "10px 12px", borderRadius: 4, border: `1px solid ${item.halfTimeSignal ? "#0ea5e988" : "var(--border)"}`, background: item.halfTimeSignal ? "var(--bg3)" : "transparent", color: item.halfTimeSignal ? "#0ea5e9" : "var(--text3)", fontSize: 13, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontWeight: item.halfTimeSignal ? 700 : 400 } },
                 item.halfTimeSignal ? "✓" : "", "🔄 Signal nach der Hälfte",
                 item.workSec >= 2 && item.halfTimeSignal && React.createElement("span", { style: { fontSize: 11, opacity: 0.8 } }, " (bei ", Math.floor(item.workSec / 2), "s)")
               ),
               React.createElement("div", { style: { marginTop: 8, fontSize: 14, textAlign: "right", ...S.text4 } }, item.sets, "× ", item.workSec, "s / ", item.restSec, "s · ", React.createElement("span", { style: S.text3 }, Math.ceil((item.sets * item.workSec + (item.sets - 1) * item.restSec) / 60), " min"))
             ),
-            !hasBreakAfter && React.createElement("button", { onClick: () => addBreakAfter(idx), style: { width: "100%", padding: "8px", borderRadius: 8, border: "1px dashed var(--border)", background: "none", color: "#a855f7", fontSize: 14, fontFamily: "inherit", cursor: "pointer", letterSpacing: 1, marginBottom: 6 } }, "☕ Pause einfügen")
+            !hasBreakAfter && React.createElement("button", { onClick: () => addBreakAfter(idx), style: { width: "100%", padding: "8px", borderRadius: 4, border: "1px dashed var(--border)", background: "none", color: "#a855f7", fontSize: 14, fontFamily: "inherit", cursor: "pointer", letterSpacing: 1, marginBottom: 6 } }, "☕ Pause einfügen")
           );
         }),
-        React.createElement("button", { onClick: addExercise, style: { width: "100%", padding: "14px", borderRadius: 10, border: "2px dashed var(--border)", background: "none", color: "#22c55e", fontSize: 14, fontFamily: "inherit", cursor: "pointer", letterSpacing: 2, fontWeight: 700 } }, "+ Übung hinzufügen")
+        React.createElement("button", { onClick: addExercise, style: { width: "100%", padding: "14px", borderRadius: 4, border: "2px dashed var(--border)", background: "none", color: "#22c55e", fontSize: 14, fontFamily: "inherit", cursor: "pointer", letterSpacing: 2, fontWeight: 700 } }, "+ Übung hinzufügen")
       ),
-      editingId && React.createElement("div", { style: { padding: "10px 14px", borderRadius: 10, background: "var(--bg3)", border: "1px solid #a855f799", display: "flex", alignItems: "center", justifyContent: "space-between" } },
+      editingId && React.createElement("div", { style: { padding: "10px 14px", borderRadius: 4, background: "var(--bg3)", border: "1px solid #a855f799", display: "flex", alignItems: "center", justifyContent: "space-between" } },
         React.createElement("div", { style: { fontSize: 13, color: "#a855f7" } }, "✏️ Bearbeitungsmodus: ", React.createElement("strong", null, savedWorkouts.find(w => w.id === editingId)?.name)),
         React.createElement("button", { onClick: () => { setEditingId(null); setEditConfig({ ...config, items: config.items.map((i, idx) => ({ _id: i._id || `item-${Date.now()}-${idx}`, ...i })) }); }, style: { background: "none", border: "none", color: "var(--text3)", cursor: "pointer", fontSize: 13, fontFamily: "inherit" } }, "Abbrechen")
       ),
@@ -1290,7 +1290,7 @@ function FitnessTimer({ user, onLogout }) {
           ),
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 } },
             [["🔁", "Runden", editConfig.rounds], ["🏋️", "Übungen", exCount], ["📦", "Sätze ges.", totalSets], ["☕", "Pausen", breakCount], ["⏱", "Vorbereitung", editConfig.countdownSec + "s"], ["💤", "Rundenpause", editConfig.restBetweenRounds + "s"]].map(([icon, label, val]) =>
-              React.createElement("div", { key: label, style: { background: "var(--bg4)", borderRadius: 10, padding: "10px 12px", textAlign: "center" } },
+              React.createElement("div", { key: label, style: { background: "var(--bg4)", borderRadius: 4, padding: "10px 12px", textAlign: "center" } },
                 React.createElement("div", { style: { fontSize: 18, marginBottom: 4 } }, icon),
                 React.createElement("div", { style: { fontSize: 16, fontWeight: 700, ...S.text } }, val),
                 React.createElement("div", { style: { fontSize: 11, ...S.text3, marginTop: 2 } }, label)
@@ -1300,17 +1300,17 @@ function FitnessTimer({ user, onLogout }) {
         );
       })(),
       React.createElement("div", { style: { display: "flex", gap: 10 } },
-        React.createElement("button", { onClick: () => setShowSaveDialog(true), style: { flex: 1, padding: "16px", borderRadius: 14, border: "2px solid #a855f7", background: "transparent", color: "#a855f7", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", letterSpacing: 1 } }, "💾 Speichern"),
-        React.createElement("button", { onClick: applyConfig, style: { flex: 2, padding: "16px", borderRadius: 14, border: "none", background: "#22c55e", color: "#fff", fontSize: 14, fontWeight: 800, fontFamily: "inherit", cursor: "pointer", letterSpacing: 2, textTransform: "uppercase", boxShadow: "0 4px 20px #22c55e44" } }, "✓ Anwenden")
+        React.createElement("button", { onClick: () => setShowSaveDialog(true), style: { flex: 1, padding: "16px", borderRadius: 4, border: "2px solid #f97316", background: "transparent", color: "#f97316", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", letterSpacing: 1 } }, "💾 Speichern"),
+        React.createElement("button", { onClick: applyConfig, style: { flex: 2, padding: "16px", borderRadius: 4, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontWeight: 800, fontFamily: "inherit", cursor: "pointer", letterSpacing: 2, textTransform: "uppercase", boxShadow: "0 4px 20px #f9731644" } }, "✓ Anwenden")
       ),
       showSaveDialog && React.createElement("div", { style: { position: "fixed", inset: 0, background: "var(--overlay)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 100, padding: "0 0 40px 0" } },
-        React.createElement("div", { style: { width: "100%", maxWidth: 480, ...S.card, borderRadius: "20px 20px 0 0", padding: "28px 24px" } },
+        React.createElement("div", { style: { width: "100%", maxWidth: 480, ...S.card, borderRadius: "4px 4px 0 0", padding: "28px 24px" } },
           React.createElement("div", { style: { fontSize: 16, fontWeight: 700, marginBottom: 20, ...S.text } }, editingId ? "Training aktualisieren" : "Training speichern"),
           editingId && React.createElement("div", { style: { fontSize: 13, ...S.text3, marginBottom: 10, lineHeight: 1.5 } }, "Der Name \"", React.createElement("strong", { style: S.text2 }, savedWorkouts.find(w => w.id === editingId)?.name), "\" bleibt erhalten. Optional: neuen Namen vergeben."),
-          React.createElement("input", { autoFocus: true, value: saveName, onChange: e => setSaveName(e.target.value), onKeyDown: e => e.key === "Enter" && handleSaveWorkout(), placeholder: editingId ? (savedWorkouts.find(w => w.id === editingId)?.name || "Name des Trainings…") : "Name des Trainings…", style: { width: "100%", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "14px", outline: "none", boxSizing: "border-box", marginBottom: 16 } }),
+          React.createElement("input", { autoFocus: true, value: saveName, onChange: e => setSaveName(e.target.value), onKeyDown: e => e.key === "Enter" && handleSaveWorkout(), placeholder: editingId ? (savedWorkouts.find(w => w.id === editingId)?.name || "Name des Trainings…") : "Name des Trainings…", style: { width: "100%", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "14px", outline: "none", boxSizing: "border-box", marginBottom: 16 } }),
           React.createElement("div", { style: { display: "flex", gap: 10 } },
-            React.createElement("button", { onClick: () => { setShowSaveDialog(false); setSaveName(""); }, style: { flex: 1, padding: "14px", borderRadius: 12, border: "1px solid var(--border)", background: "none", ...S.text3, fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Abbrechen"),
-            React.createElement("button", { onClick: handleSaveWorkout, disabled: !editingId && !saveName.trim(), style: { flex: 2, padding: "14px", borderRadius: 12, border: "none", background: (editingId || saveName.trim()) ? "#a855f7" : "var(--bg3)", color: (editingId || saveName.trim()) ? "#fff" : "var(--text4)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: (editingId || saveName.trim()) ? "pointer" : "default" } }, editingId ? "💾 Aktualisieren" : "💾 Speichern")
+            React.createElement("button", { onClick: () => { setShowSaveDialog(false); setSaveName(""); }, style: { flex: 1, padding: "14px", borderRadius: 4, border: "1px solid var(--border)", background: "none", ...S.text3, fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Abbrechen"),
+            React.createElement("button", { onClick: handleSaveWorkout, disabled: !editingId && !saveName.trim(), style: { flex: 2, padding: "14px", borderRadius: 4, border: "none", background: (editingId || saveName.trim()) ? "#f97316" : "var(--bg3)", color: (editingId || saveName.trim()) ? "#fff" : "var(--text4)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: (editingId || saveName.trim()) ? "pointer" : "default" } }, editingId ? "💾 Aktualisieren" : "💾 Speichern")
           )
         )
       )
@@ -1327,7 +1327,7 @@ function FitnessTimer({ user, onLogout }) {
             a.href = url; a.download = "intervallcoach-backup-" + new Date().toISOString().slice(0,10) + ".json";
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
           },
-          style: { flex: 1, padding: "12px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg2)", color: "var(--text2)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }
+          style: { flex: 1, padding: "12px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg2)", color: "var(--text2)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }
         }, "⬇️ Exportieren"),
         React.createElement("button", {
           onClick: () => {
@@ -1340,7 +1340,7 @@ function FitnessTimer({ user, onLogout }) {
             };
             inp.click();
           },
-          style: { flex: 1, padding: "12px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg2)", color: "var(--text2)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }
+          style: { flex: 1, padding: "12px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg2)", color: "var(--text2)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }
         }, "⬆️ Importieren")
       ),
       pendingImport && React.createElement("div", { style: { ...S.card, padding: "20px" } },
@@ -1352,7 +1352,7 @@ function FitnessTimer({ user, onLogout }) {
           pendingImport.exportedAt && React.createElement("div", { style: { fontSize: 12, ...S.text3, marginTop: 4 } }, "Erstellt: ", new Date(pendingImport.exportedAt).toLocaleString("de-DE"))
         ),
         React.createElement("div", { style: { display: "flex", gap: 8 } },
-          React.createElement("button", { onClick: () => setPendingImport(null), style: { flex: 1, padding: "12px", borderRadius: 10, border: "1px solid var(--border)", background: "none", ...S.text3, fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Abbrechen"),
+          React.createElement("button", { onClick: () => setPendingImport(null), style: { flex: 1, padding: "12px", borderRadius: 4, border: "1px solid var(--border)", background: "none", ...S.text3, fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Abbrechen"),
           React.createElement("button", {
             onClick: async () => {
               const imports = pendingImport.savedWorkouts || [];
@@ -1373,7 +1373,7 @@ function FitnessTimer({ user, onLogout }) {
               alert("Migration abgeschlossen! " + ok + " Workouts importiert" + (fail > 0 ? ", " + fail + " fehlgeschlagen" : "") + ".");
               window.location.reload();
             },
-            style: { flex: 2, padding: "12px", borderRadius: 10, border: "none", background: "#22c55e", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+            style: { flex: 2, padding: "12px", borderRadius: 4, border: "none", background: "#22c55e", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
           }, "✓ Importieren")
         )
       ),
@@ -1381,10 +1381,10 @@ function FitnessTimer({ user, onLogout }) {
       (() => {
         const hasLocal = localStorage.getItem("fitness-timer-workouts-v3");
         if (!hasLocal) return null;
-        return React.createElement("div", { style: { padding: "14px 16px", borderRadius: 12, background: "var(--bg3)", border: "1px solid #eab30888", display: "flex", alignItems: "center", gap: 12 } },
+        return React.createElement("div", { style: { padding: "14px 16px", borderRadius: 4, background: "var(--bg3)", border: "1px solid #eab30888", display: "flex", alignItems: "center", gap: 12 } },
           React.createElement("div", { style: { fontSize: 20 } }, "📦"),
           React.createElement("div", { style: { flex: 1, fontSize: 13, ...S.text2, lineHeight: 1.5 } }, "Lokale Daten gefunden. Auf die Cloud migrieren?"),
-          React.createElement("button", { onClick: handleMigrateLocalStorage, style: { padding: "8px 14px", borderRadius: 10, border: "none", background: "#eab308", color: "#000", fontSize: 13, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", whiteSpace: "nowrap" } }, "Migrieren")
+          React.createElement("button", { onClick: handleMigrateLocalStorage, style: { padding: "8px 14px", borderRadius: 4, border: "none", background: "#f97316", color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", whiteSpace: "nowrap" } }, "Migrieren")
         );
       })(),
       savedWorkouts.length === 0
@@ -1397,9 +1397,9 @@ function FitnessTimer({ user, onLogout }) {
               React.createElement("div", { style: { flex: 1, marginRight: 8 } },
                 renamingId === w.id
                   ? React.createElement("div", { style: { display: "flex", gap: 8, alignItems: "center" } },
-                      React.createElement("input", { autoFocus: true, value: renameVal, onChange: e => setRenameVal(e.target.value), onKeyDown: e => { if (e.key === "Enter") commitRename(w.id); if (e.key === "Escape") setRenamingId(null); }, style: { flex: 1, background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 8, color: "var(--text)", fontSize: 15, fontFamily: "inherit", padding: "6px 10px", outline: "none", fontWeight: 700 } }),
-                      React.createElement("button", { onClick: () => commitRename(w.id), style: { padding: "6px 12px", borderRadius: 8, border: "none", background: "#22c55e", color: "#fff", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "✓"),
-                      React.createElement("button", { onClick: () => setRenamingId(null), style: { padding: "6px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "none", ...S.text3, fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "✕")
+                      React.createElement("input", { autoFocus: true, value: renameVal, onChange: e => setRenameVal(e.target.value), onKeyDown: e => { if (e.key === "Enter") commitRename(w.id); if (e.key === "Escape") setRenamingId(null); }, style: { flex: 1, background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text)", fontSize: 15, fontFamily: "inherit", padding: "6px 10px", outline: "none", fontWeight: 700 } }),
+                      React.createElement("button", { onClick: () => commitRename(w.id), style: { padding: "6px 12px", borderRadius: 4, border: "none", background: "#22c55e", color: "#fff", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "✓"),
+                      React.createElement("button", { onClick: () => setRenamingId(null), style: { padding: "6px 10px", borderRadius: 4, border: "1px solid var(--border)", background: "none", ...S.text3, fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "✕")
                     )
                   : React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
                       React.createElement("div", { style: { fontSize: 16, fontWeight: 700, ...S.text } }, w.name),
@@ -1411,22 +1411,22 @@ function FitnessTimer({ user, onLogout }) {
             ),
             React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 } },
               w.config.items.filter(x => x.type === "exercise").map((ex, i) =>
-                React.createElement("div", { key: i, style: { fontSize: 14, padding: "4px 10px", borderRadius: 20, background: "var(--bg3)", ...S.text2, border: "1px solid var(--border)" } },
+                React.createElement("div", { key: i, style: { fontSize: 14, padding: "4px 10px", borderRadius: 4, background: "var(--bg3)", ...S.text2, border: "1px solid var(--border)" } },
                   ex.name, " ", React.createElement("span", { style: { color: "#f97316", fontWeight: 700 } }, ex.workSec, "s"),
                   (ex.sets || 1) > 1 && React.createElement("span", { style: { color: "#22c55e", fontWeight: 700 } }, "×", ex.sets)
                 )
               )
             ),
             React.createElement("div", { style: { display: "flex", gap: 8 } },
-              React.createElement("button", { onClick: () => handleLoadWorkout(w), style: { flex: 1, padding: "12px", borderRadius: 10, border: "2px solid #a855f7", background: "transparent", color: "#a855f7", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "✏️ Bearbeiten"),
-              React.createElement("button", { onClick: () => handleDuplicateWorkout(w), title: "Duplizieren", style: { padding: "12px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg3)", color: "var(--text3)", fontSize: 16, fontFamily: "inherit", cursor: "pointer", flexShrink: 0 } }, "⊙"),
-              React.createElement("button", { onClick: () => handleUseWorkout(w), style: { flex: 2, padding: "12px", borderRadius: 10, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "▶ Direkt starten")
+              React.createElement("button", { onClick: () => handleLoadWorkout(w), style: { flex: 1, padding: "12px", borderRadius: 4, border: "2px solid #a855f7", background: "transparent", color: "#a855f7", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "✏️ Bearbeiten"),
+              React.createElement("button", { onClick: () => handleDuplicateWorkout(w), title: "Duplizieren", style: { padding: "12px 14px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg3)", color: "var(--text3)", fontSize: 16, fontFamily: "inherit", cursor: "pointer", flexShrink: 0 } }, "⊙"),
+              React.createElement("button", { onClick: () => handleUseWorkout(w), style: { flex: 2, padding: "12px", borderRadius: 4, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "▶ Direkt starten")
             ),
-            confirmDelete === w.id && React.createElement("div", { style: { marginTop: 12, padding: "14px", background: "var(--del-bg)", borderRadius: 10, border: "1px solid var(--del-border)" } },
+            confirmDelete === w.id && React.createElement("div", { style: { marginTop: 12, padding: "14px", background: "var(--del-bg)", borderRadius: 4, border: "1px solid var(--del-border)" } },
               React.createElement("div", { style: { fontSize: 14, marginBottom: 12, color: "#f97316", fontWeight: 700 } }, "\"", w.name, "\" wirklich l\u00f6schen?"),
               React.createElement("div", { style: { display: "flex", gap: 8 } },
-                React.createElement("button", { onClick: () => setConfirmDelete(null), style: { flex: 1, padding: "10px", borderRadius: 8, border: "1px solid var(--border)", background: "none", ...S.text3, fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Nein"),
-                React.createElement("button", { onClick: () => handleDeleteWorkout(w.id), style: { flex: 1, padding: "10px", borderRadius: 8, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "Ja, löschen")
+                React.createElement("button", { onClick: () => setConfirmDelete(null), style: { flex: 1, padding: "10px", borderRadius: 4, border: "1px solid var(--border)", background: "none", ...S.text3, fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Nein"),
+                React.createElement("button", { onClick: () => handleDeleteWorkout(w.id), style: { flex: 1, padding: "10px", borderRadius: 4, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "Ja, löschen")
               )
             )
           ))
@@ -1458,7 +1458,7 @@ function FitnessTimer({ user, onLogout }) {
                   weekStats.map((d, i) =>
                     React.createElement("div", { key: i, style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, height: "100%", justifyContent: "flex-end" } },
                       d.totalSec > 0 && React.createElement("div", { style: { fontSize: 10, fontWeight: 700, color: d.isToday ? "#22c55e" : "var(--text3)", whiteSpace: "nowrap" } }, Math.round(d.totalSec / 60), "min"),
-                      React.createElement("div", { style: { width: "100%", maxWidth: 28, borderRadius: 6, minHeight: 4, height: `${Math.max((d.totalSec / maxSec) * 100, d.totalSec > 0 ? 8 : 0)}%`, background: d.totalSec === 0 ? "var(--bg3)" : d.isToday ? "#22c55e" : "#f97316", border: d.totalSec === 0 ? "1px dashed var(--border)" : "none", transition: "height 0.5s cubic-bezier(.34,1.3,.64,1)" } }),
+                      React.createElement("div", { style: { width: "100%", maxWidth: 28, borderRadius: 4, minHeight: 4, height: `${Math.max((d.totalSec / maxSec) * 100, d.totalSec > 0 ? 8 : 0)}%`, background: d.totalSec === 0 ? "var(--bg3)" : d.isToday ? "#22c55e" : "#f97316", border: d.totalSec === 0 ? "1px dashed var(--border)" : "none", transition: "height 0.5s cubic-bezier(.34,1.3,.64,1)" } }),
                       React.createElement("div", { style: { fontSize: 12, fontWeight: d.isToday ? 800 : 400, color: d.isToday ? "#22c55e" : "var(--text3)" } }, d.label)
                     )
                   )
@@ -1474,7 +1474,7 @@ function FitnessTimer({ user, onLogout }) {
                   React.createElement("div", { style: { fontSize: 14, letterSpacing: 3, textTransform: "uppercase", ...S.text3 } }, "Erfolge"),
                   React.createElement("div", { style: { fontSize: 13, ...S.text3 } }, unlockedCount, " / ", BADGES.length)
                 ),
-                longestStreak > 0 && React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 14, padding: "10px 12px", borderRadius: 10, background: "var(--bg3)" } },
+                longestStreak > 0 && React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 14, padding: "10px 12px", borderRadius: 4, background: "var(--bg3)" } },
                   React.createElement("div", { style: { fontSize: 22 } }, "🔥"),
                   React.createElement("div", null,
                     React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: "#f97316" } }, longestStreak, " Tage"),
@@ -1484,7 +1484,7 @@ function FitnessTimer({ user, onLogout }) {
                 React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 } },
                   BADGES.map(b => {
                     const unlocked = unlockedSet.has(b.id);
-                    return React.createElement("div", { key: b.id, title: b.name + " — " + b.desc, style: { aspectRatio: "1", borderRadius: 12, background: unlocked ? "var(--bg3)" : "var(--bg4)", border: `1px solid ${unlocked ? "#f9731688" : "var(--border2)"}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontSize: 22, opacity: unlocked ? 1 : 0.35, filter: unlocked ? "none" : "grayscale(1)", position: "relative" } },
+                    return React.createElement("div", { key: b.id, title: b.name + " — " + b.desc, style: { aspectRatio: "1", borderRadius: 4, background: unlocked ? "var(--bg3)" : "var(--bg4)", border: `1px solid ${unlocked ? "#f9731688" : "var(--border2)"}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontSize: 22, opacity: unlocked ? 1 : 0.35, filter: unlocked ? "none" : "grayscale(1)", position: "relative" } },
                       b.icon,
                       !unlocked && React.createElement("div", { style: { position: "absolute", bottom: 4, fontSize: 10 } }, "🔒")
                     );
@@ -1493,7 +1493,7 @@ function FitnessTimer({ user, onLogout }) {
               );
             })(),
             history.map(h => React.createElement("div", { key: h.id, style: { ...S.card, padding: "14px", display: "flex", alignItems: "center", gap: 14 } },
-              React.createElement("div", { style: { width: 42, height: 42, borderRadius: 10, background: "var(--bg3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 } }, "🏋️"),
+              React.createElement("div", { style: { width: 42, height: 42, borderRadius: 4, background: "var(--bg3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 } }, "🏋️"),
               React.createElement("div", { style: { flex: 1, minWidth: 0 } },
                 React.createElement("div", { style: { fontSize: 14, fontWeight: 700, ...S.text, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, h.name),
                 React.createElement("div", { style: { fontSize: 15, ...S.text3 } }, h.date, " ", h.time, " · ", h.exercises, " Übungen · ", h.rounds, " Runden")
@@ -1519,11 +1519,11 @@ function FitnessTimer({ user, onLogout }) {
         )
       ),
       // Status message
-      profileMsg.text && React.createElement("div", { style: { padding: "12px 14px", borderRadius: 10, fontSize: 14, background: profileMsg.type === "error" ? "var(--del-bg)" : "var(--bg3)", border: "1px solid " + (profileMsg.type === "error" ? "var(--del-border)" : "#22c55e44"), color: profileMsg.type === "error" ? "#f97316" : "#22c55e" } }, profileMsg.text),
+      profileMsg.text && React.createElement("div", { style: { padding: "12px 14px", borderRadius: 4, fontSize: 14, background: profileMsg.type === "error" ? "var(--del-bg)" : "var(--bg3)", border: "1px solid " + (profileMsg.type === "error" ? "var(--del-border)" : "#22c55e44"), color: profileMsg.type === "error" ? "#f97316" : "#22c55e" } }, profileMsg.text),
       // Name change
       React.createElement("div", { style: { ...S.card, padding: "20px" } },
         React.createElement("div", { style: { fontSize: 13, letterSpacing: 3, textTransform: "uppercase", marginBottom: 14, ...S.text3 } }, "Name aendern"),
-        React.createElement("input", { value: profileName, onChange: e => setProfileName(e.target.value), placeholder: "Dein Name", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 12 } }),
+        React.createElement("input", { value: profileName, onChange: e => setProfileName(e.target.value), placeholder: "Dein Name", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 12 } }),
         React.createElement("button", {
           disabled: profileLoading || !profileName.trim(),
           onClick: async () => {
@@ -1534,15 +1534,15 @@ function FitnessTimer({ user, onLogout }) {
             } catch(e) { setProfileMsg({ type: "error", text: e.message }); }
             finally { setProfileLoading(false); }
           },
-          style: { width: "100%", padding: "12px", borderRadius: 10, border: "none", background: profileName.trim() ? "#22c55e" : "var(--bg3)", color: profileName.trim() ? "#fff" : "var(--text4)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: profileName.trim() ? "pointer" : "default" }
+          style: { width: "100%", padding: "12px", borderRadius: 4, border: "none", background: profileName.trim() ? "#f97316" : "var(--bg3)", color: profileName.trim() ? "#fff" : "var(--text4)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: profileName.trim() ? "pointer" : "default" }
         }, profileLoading ? "..." : "Speichern")
       ),
       // Password change
       React.createElement("div", { style: { ...S.card, padding: "20px" } },
         React.createElement("div", { style: { fontSize: 13, letterSpacing: 3, textTransform: "uppercase", marginBottom: 14, ...S.text3 } }, "Passwort aendern"),
-        React.createElement("input", { type: "password", value: profilePwOld, onChange: e => setProfilePwOld(e.target.value), placeholder: "Aktuelles Passwort", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 10 } }),
-        React.createElement("input", { type: "password", value: profilePwNew, onChange: e => setProfilePwNew(e.target.value), placeholder: "Neues Passwort (min. 8 Zeichen)", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 10 } }),
-        React.createElement("input", { type: "password", value: profilePwNew2, onChange: e => setProfilePwNew2(e.target.value), placeholder: "Neues Passwort wiederholen", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 12 } }),
+        React.createElement("input", { type: "password", value: profilePwOld, onChange: e => setProfilePwOld(e.target.value), placeholder: "Aktuelles Passwort", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 10 } }),
+        React.createElement("input", { type: "password", value: profilePwNew, onChange: e => setProfilePwNew(e.target.value), placeholder: "Neues Passwort (min. 8 Zeichen)", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 10 } }),
+        React.createElement("input", { type: "password", value: profilePwNew2, onChange: e => setProfilePwNew2(e.target.value), placeholder: "Neues Passwort wiederholen", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 4, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 12 } }),
         React.createElement("button", {
           disabled: profileLoading,
           onClick: async () => {
@@ -1557,29 +1557,29 @@ function FitnessTimer({ user, onLogout }) {
             } catch(e) { setProfileMsg({ type: "error", text: e.message }); }
             finally { setProfileLoading(false); }
           },
-          style: { width: "100%", padding: "12px", borderRadius: 10, border: "none", background: "#22c55e", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+          style: { width: "100%", padding: "12px", borderRadius: 4, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
         }, profileLoading ? "..." : "Passwort aendern")
       ),
       // Logout
       React.createElement("button", {
         onClick: onLogout,
-        style: { width: "100%", padding: "14px", borderRadius: 12, border: "1px solid var(--border)", background: "var(--bg2)", color: "var(--text3)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+        style: { width: "100%", padding: "14px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg2)", color: "var(--text3)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
       }, "\u21A9 Abmelden"),
       // Delete account
       React.createElement("button", {
         onClick: () => setShowDeleteAccount(true),
-        style: { width: "100%", padding: "14px", borderRadius: 12, border: "1px solid var(--del-border)", background: "var(--del-bg)", color: "#f97316", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+        style: { width: "100%", padding: "14px", borderRadius: 4, border: "1px solid var(--del-border)", background: "var(--del-bg)", color: "#f97316", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
       }, "\uD83D\uDDD1 Account loeschen")
     ),
 
         showDeleteAccount && React.createElement("div", { style: { position: "fixed", inset: 0, background: "var(--overlay)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 1100, padding: "0 0 40px 0" } },
-      React.createElement("div", { style: { width: "100%", maxWidth: 480, background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: "20px 20px 0 0", padding: "28px 24px" } },
+      React.createElement("div", { style: { width: "100%", maxWidth: 480, background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: "4px 4px 0 0", padding: "28px 24px" } },
         React.createElement("div", { style: { fontSize: 16, fontWeight: 700, marginBottom: 12, color: "#f97316" } }, "\uD83D\uDDD1 Account loeschen"),
         React.createElement("div", { style: { fontSize: 14, color: "var(--text3)", lineHeight: 1.7, marginBottom: 20 } },
           "Dein Account und alle Daten (Trainings, Historie, Badges) werden ", React.createElement("strong", null, "unwiderruflich"), " geloescht. Diese Aktion kann nicht rueckgaengig gemacht werden."
         ),
         React.createElement("div", { style: { display: "flex", gap: 10 } },
-          React.createElement("button", { onClick: () => setShowDeleteAccount(false), style: { flex: 1, padding: "14px", borderRadius: 12, border: "1px solid var(--border)", background: "none", color: "var(--text3)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Abbrechen"),
+          React.createElement("button", { onClick: () => setShowDeleteAccount(false), style: { flex: 1, padding: "14px", borderRadius: 4, border: "1px solid var(--border)", background: "none", color: "var(--text3)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Abbrechen"),
           React.createElement("button", {
             onClick: async () => {
               try {
@@ -1588,12 +1588,12 @@ function FitnessTimer({ user, onLogout }) {
                 onLogout();
               } catch(e) { alert("Fehler: " + e.message); }
             },
-            style: { flex: 2, padding: "14px", borderRadius: 12, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+            style: { flex: 2, padding: "14px", borderRadius: 4, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
           }, "Ja, Account endgueltig loeschen")
         )
       )
     ),
-    badgeToast && React.createElement("div", { style: { position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 1000, display: "flex", alignItems: "center", gap: 12, background: "var(--bg2)", border: "2px solid #f97316", borderRadius: 16, padding: "14px 20px", boxShadow: dark ? "0 8px 30px #00000088" : "0 8px 30px #00000033", maxWidth: "calc(100% - 40px)" } },
+    badgeToast && React.createElement("div", { style: { position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 1000, display: "flex", alignItems: "center", gap: 12, background: "var(--bg2)", border: "2px solid #f97316", borderRadius: 4, padding: "14px 20px", boxShadow: dark ? "0 8px 30px #00000088" : "0 8px 30px #00000033", maxWidth: "calc(100% - 40px)" } },
       React.createElement("div", { style: { fontSize: 32 } }, badgeToast.icon),
       React.createElement("div", null,
         React.createElement("div", { style: { fontSize: 12, letterSpacing: 2, textTransform: "uppercase", color: "#f97316", fontWeight: 800, marginBottom: 2 } }, "Neuer Erfolg!"),

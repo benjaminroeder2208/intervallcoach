@@ -1,7 +1,7 @@
 {
-  "name": "Tabata & Intervall Trainer",
-  "short_name": "Tabata",
-  "description": "Individueller Intervall-Timer für dein Training",
+  "name": "Intervall & Tabata Coach",
+  "short_name": "Intervall Coach",
+  "description": "Tabata, HIIT und Custom-Intervalle mit Sprachausgabe, Trainingshistorie und Streak-System",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
