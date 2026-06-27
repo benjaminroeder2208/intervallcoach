@@ -616,6 +616,12 @@ function FitnessTimer({ user, onLogout }) {
   const [showMigration, setShowMigration] = useState(false);
   const [pendingImport, setPendingImport] = useState(null);
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [profileName, setProfileName] = useState(user.name || "");
+  const [profilePwOld, setProfilePwOld] = useState("");
+  const [profilePwNew, setProfilePwNew] = useState("");
+  const [profilePwNew2, setProfilePwNew2] = useState("");
+  const [profileMsg, setProfileMsg] = useState({ type: "", text: "" });
+  const [profileLoading, setProfileLoading] = useState(false);
 
   // Timer state
   const [phase, setPhase] = useState(PHASES.IDLE);
@@ -1042,7 +1048,8 @@ function FitnessTimer({ user, onLogout }) {
     { id: "timer", label: "▶ Timer" },
     { id: "config", label: editingId ? "✏️ Bearbeiten" : "⚙ Setup" },
     { id: "workouts", label: `📂${savedWorkouts.length > 0 ? ` (${savedWorkouts.length})` : ""}` },
-    { id: "history", label: `📈${history.length > 0 ? ` (${history.length})` : ""}` }
+    { id: "history", label: `📈${history.length > 0 ? ` (${history.length})` : ""}` },
+    { id: "profile", label: "\u{1F464}" }
   ];
 
   const S = {
@@ -1101,12 +1108,7 @@ function FitnessTimer({ user, onLogout }) {
           onClick: onLogout,
           title: `Abmelden (${user.email})`,
           style: { background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text3)", cursor: "pointer", fontSize: 13, padding: "6px 10px", fontFamily: "inherit" }
-        }, "↩"),
-        React.createElement("button", {
-          onClick: () => setShowDeleteAccount(true),
-          title: "Account loeschen",
-          style: { background: "var(--del-bg)", border: "1px solid var(--del-border)", borderRadius: 10, color: "#f97316", cursor: "pointer", fontSize: 13, padding: "6px 10px", fontFamily: "inherit" }
-        }, "\uD83D\uDDD1")
+        }, "↩")
       )
     ),
 
@@ -1503,7 +1505,72 @@ function FitnessTimer({ user, onLogout }) {
     ),
 
     // ── Toasts & Overlays ─────────────────────────────────────────────────
-    showDeleteAccount && React.createElement("div", { style: { position: "fixed", inset: 0, background: "var(--overlay)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 1100, padding: "0 0 40px 0" } },
+    // ── Profile Tab ───────────────────────────────────────────────────────
+    tab === "profile" && React.createElement("div", { style: { width: "100%", maxWidth: 480, padding: "24px 20px 0", display: "flex", flexDirection: "column", gap: 16 } },
+      // User info
+      React.createElement("div", { style: { ...S.card, padding: "16px", display: "flex", alignItems: "center", gap: 14 } },
+        React.createElement("div", { style: { width: 48, height: 48, borderRadius: "50%", background: "var(--bg3)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 } }, "\u{1F464}"),
+        React.createElement("div", null,
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 700, ...S.text } }, user.name || "Kein Name"),
+          React.createElement("div", { style: { fontSize: 13, ...S.text3, marginTop: 2 } }, user.email),
+          React.createElement("div", { style: { fontSize: 11, marginTop: 4, color: user.plan === "pro" ? "#f97316" : "var(--text4)", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" } }, user.plan === "pro" ? "\u2B50 Pro" : "Free")
+        )
+      ),
+      // Status message
+      profileMsg.text && React.createElement("div", { style: { padding: "12px 14px", borderRadius: 10, fontSize: 14, background: profileMsg.type === "error" ? "var(--del-bg)" : "var(--bg3)", border: "1px solid " + (profileMsg.type === "error" ? "var(--del-border)" : "#22c55e44"), color: profileMsg.type === "error" ? "#f97316" : "#22c55e" } }, profileMsg.text),
+      // Name change
+      React.createElement("div", { style: { ...S.card, padding: "20px" } },
+        React.createElement("div", { style: { fontSize: 13, letterSpacing: 3, textTransform: "uppercase", marginBottom: 14, ...S.text3 } }, "Name aendern"),
+        React.createElement("input", { value: profileName, onChange: e => setProfileName(e.target.value), placeholder: "Dein Name", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 12 } }),
+        React.createElement("button", {
+          disabled: profileLoading || !profileName.trim(),
+          onClick: async () => {
+            setProfileLoading(true); setProfileMsg({ type: "", text: "" });
+            try {
+              await apiRequest("PUT", "/auth/profile", { name: profileName.trim() });
+              setProfileMsg({ type: "ok", text: "Name erfolgreich gespeichert." });
+            } catch(e) { setProfileMsg({ type: "error", text: e.message }); }
+            finally { setProfileLoading(false); }
+          },
+          style: { width: "100%", padding: "12px", borderRadius: 10, border: "none", background: profileName.trim() ? "#22c55e" : "var(--bg3)", color: profileName.trim() ? "#fff" : "var(--text4)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: profileName.trim() ? "pointer" : "default" }
+        }, profileLoading ? "..." : "Speichern")
+      ),
+      // Password change
+      React.createElement("div", { style: { ...S.card, padding: "20px" } },
+        React.createElement("div", { style: { fontSize: 13, letterSpacing: 3, textTransform: "uppercase", marginBottom: 14, ...S.text3 } }, "Passwort aendern"),
+        React.createElement("input", { type: "password", value: profilePwOld, onChange: e => setProfilePwOld(e.target.value), placeholder: "Aktuelles Passwort", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 10 } }),
+        React.createElement("input", { type: "password", value: profilePwNew, onChange: e => setProfilePwNew(e.target.value), placeholder: "Neues Passwort (min. 8 Zeichen)", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 10 } }),
+        React.createElement("input", { type: "password", value: profilePwNew2, onChange: e => setProfilePwNew2(e.target.value), placeholder: "Neues Passwort wiederholen", style: { width: "100%", boxSizing: "border-box", background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)", fontSize: 16, fontFamily: "inherit", padding: "12px 14px", outline: "none", marginBottom: 12 } }),
+        React.createElement("button", {
+          disabled: profileLoading,
+          onClick: async () => {
+            if (!profilePwOld || !profilePwNew) { setProfileMsg({ type: "error", text: "Alle Felder ausfullen." }); return; }
+            if (profilePwNew.length < 8) { setProfileMsg({ type: "error", text: "Neues Passwort mindestens 8 Zeichen." }); return; }
+            if (profilePwNew !== profilePwNew2) { setProfileMsg({ type: "error", text: "Passwoerter stimmen nicht ueberein." }); return; }
+            setProfileLoading(true); setProfileMsg({ type: "", text: "" });
+            try {
+              await apiRequest("PUT", "/auth/profile", { currentPassword: profilePwOld, newPassword: profilePwNew });
+              setProfileMsg({ type: "ok", text: "Passwort erfolgreich geaendert." });
+              setProfilePwOld(""); setProfilePwNew(""); setProfilePwNew2("");
+            } catch(e) { setProfileMsg({ type: "error", text: e.message }); }
+            finally { setProfileLoading(false); }
+          },
+          style: { width: "100%", padding: "12px", borderRadius: 10, border: "none", background: "#22c55e", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+        }, profileLoading ? "..." : "Passwort aendern")
+      ),
+      // Logout
+      React.createElement("button", {
+        onClick: onLogout,
+        style: { width: "100%", padding: "14px", borderRadius: 12, border: "1px solid var(--border)", background: "var(--bg2)", color: "var(--text3)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+      }, "\u21A9 Abmelden"),
+      // Delete account
+      React.createElement("button", {
+        onClick: () => setShowDeleteAccount(true),
+        style: { width: "100%", padding: "14px", borderRadius: 12, border: "1px solid var(--del-border)", background: "var(--del-bg)", color: "#f97316", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+      }, "\uD83D\uDDD1 Account loeschen")
+    ),
+
+        showDeleteAccount && React.createElement("div", { style: { position: "fixed", inset: 0, background: "var(--overlay)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 1100, padding: "0 0 40px 0" } },
       React.createElement("div", { style: { width: "100%", maxWidth: 480, background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: "20px 20px 0 0", padding: "28px 24px" } },
         React.createElement("div", { style: { fontSize: 16, fontWeight: 700, marginBottom: 12, color: "#f97316" } }, "\uD83D\uDDD1 Account loeschen"),
         React.createElement("div", { style: { fontSize: 14, color: "var(--text3)", lineHeight: 1.7, marginBottom: 20 } },
