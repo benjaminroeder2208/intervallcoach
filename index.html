@@ -598,6 +598,7 @@ function FitnessTimer({ user, onLogout }) {
   const workoutStartRef = useRef(null);
   const [showMigration, setShowMigration] = useState(false);
   const [pendingImport, setPendingImport] = useState(null);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
   // Timer state
   const [phase, setPhase] = useState(PHASES.IDLE);
@@ -1083,7 +1084,12 @@ function FitnessTimer({ user, onLogout }) {
           onClick: onLogout,
           title: `Abmelden (${user.email})`,
           style: { background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text3)", cursor: "pointer", fontSize: 13, padding: "6px 10px", fontFamily: "inherit" }
-        }, "↩")
+        }, "↩"),
+        React.createElement("button", {
+          onClick: () => setShowDeleteAccount(true),
+          title: "Account loeschen",
+          style: { background: "var(--del-bg)", border: "1px solid var(--del-border)", borderRadius: 10, color: "#f97316", cursor: "pointer", fontSize: 13, padding: "6px 10px", fontFamily: "inherit" }
+        }, "\uD83D\uDDD1")
       )
     ),
 
@@ -1480,6 +1486,27 @@ function FitnessTimer({ user, onLogout }) {
     ),
 
     // ── Toasts & Overlays ─────────────────────────────────────────────────
+    showDeleteAccount && React.createElement("div", { style: { position: "fixed", inset: 0, background: "var(--overlay)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 1100, padding: "0 0 40px 0" } },
+      React.createElement("div", { style: { width: "100%", maxWidth: 480, background: "var(--bg2)", border: "1px solid var(--border2)", borderRadius: "20px 20px 0 0", padding: "28px 24px" } },
+        React.createElement("div", { style: { fontSize: 16, fontWeight: 700, marginBottom: 12, color: "#f97316" } }, "\uD83D\uDDD1 Account loeschen"),
+        React.createElement("div", { style: { fontSize: 14, color: "var(--text3)", lineHeight: 1.7, marginBottom: 20 } },
+          "Dein Account und alle Daten (Trainings, Historie, Badges) werden ", React.createElement("strong", null, "unwiderruflich"), " geloescht. Diese Aktion kann nicht rueckgaengig gemacht werden."
+        ),
+        React.createElement("div", { style: { display: "flex", gap: 10 } },
+          React.createElement("button", { onClick: () => setShowDeleteAccount(false), style: { flex: 1, padding: "14px", borderRadius: 12, border: "1px solid var(--border)", background: "none", color: "var(--text3)", fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Abbrechen"),
+          React.createElement("button", {
+            onClick: async () => {
+              try {
+                await apiRequest("DELETE", "/auth/account");
+                _accessToken = null;
+                onLogout();
+              } catch(e) { alert("Fehler: " + e.message); }
+            },
+            style: { flex: 2, padding: "14px", borderRadius: 12, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+          }, "Ja, Account endgueltig loeschen")
+        )
+      )
+    ),
     badgeToast && React.createElement("div", { style: { position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 1000, display: "flex", alignItems: "center", gap: 12, background: "var(--bg2)", border: "2px solid #f97316", borderRadius: 16, padding: "14px 20px", boxShadow: dark ? "0 8px 30px #00000088" : "0 8px 30px #00000033", maxWidth: "calc(100% - 40px)" } },
       React.createElement("div", { style: { fontSize: 32 } }, badgeToast.icon),
       React.createElement("div", null,
