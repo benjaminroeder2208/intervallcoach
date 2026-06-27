@@ -490,6 +490,7 @@ function FitnessTimer({ user, onLogout }) {
   const [activeWorkoutName, setActiveWorkoutName] = useState("");
   const workoutStartRef = useRef(null);
   const [showMigration, setShowMigration] = useState(false);
+  const [pendingImport, setPendingImport] = useState(null);
 
   // Timer state
   const [phase, setPhase] = useState(PHASES.IDLE);
@@ -1183,7 +1184,66 @@ function FitnessTimer({ user, onLogout }) {
 
     // ── Workouts Tab ──────────────────────────────────────────────────────
     tab === "workouts" && React.createElement("div", { style: { width: "100%", maxWidth: 480, padding: "24px 20px 0", display: "flex", flexDirection: "column", gap: 12 } },
-      // Migration banner (if localStorage data exists)
+      React.createElement("div", { style: { display: "flex", gap: 8 } },
+        React.createElement("button", {
+          onClick: () => {
+            const data = { app: "intervall-coach", version: 2, exportedAt: new Date().toISOString(), savedWorkouts, history, unlockedBadges };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob); const a = document.createElement("a");
+            a.href = url; a.download = "intervallcoach-backup-" + new Date().toISOString().slice(0,10) + ".json";
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+          },
+          style: { flex: 1, padding: "12px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg2)", color: "var(--text2)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }
+        }, "⬇️ Exportieren"),
+        React.createElement("button", {
+          onClick: () => {
+            const inp = document.createElement("input"); inp.type = "file"; inp.accept = "application/json";
+            inp.onchange = e => {
+              const file = e.target.files[0]; if (!file) return;
+              const reader = new FileReader();
+              reader.onload = ev => { try { const data = JSON.parse(ev.target.result); if (!data || !Array.isArray(data.savedWorkouts)) { alert("Ungültige Backup-Datei."); return; } setPendingImport(data); } catch(err) { alert("Fehler: " + err.message); } };
+              reader.readAsText(file);
+            };
+            inp.click();
+          },
+          style: { flex: 1, padding: "12px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg2)", color: "var(--text2)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }
+        }, "⬆️ Importieren")
+      ),
+      pendingImport && React.createElement("div", { style: { ...S.card, padding: "20px" } },
+        React.createElement("div", { style: { fontSize: 15, fontWeight: 700, marginBottom: 12, ...S.text } }, "📥 Backup importieren"),
+        React.createElement("div", { style: { ...S.inner, padding: "12px 14px", marginBottom: 16, fontSize: 14, ...S.text2, lineHeight: 1.8 } },
+          React.createElement("div", null, "📂 ", (pendingImport.savedWorkouts || []).length, " Trainings"),
+          React.createElement("div", null, "📈 ", (pendingImport.history || []).length, " Verläufe"),
+          React.createElement("div", null, "🏆 ", (pendingImport.unlockedBadges || []).length, " Erfolge"),
+          pendingImport.exportedAt && React.createElement("div", { style: { fontSize: 12, ...S.text3, marginTop: 4 } }, "Erstellt: ", new Date(pendingImport.exportedAt).toLocaleString("de-DE"))
+        ),
+        React.createElement("div", { style: { display: "flex", gap: 8 } },
+          React.createElement("button", { onClick: () => setPendingImport(null), style: { flex: 1, padding: "12px", borderRadius: 10, border: "1px solid var(--border)", background: "none", ...S.text3, fontSize: 14, fontFamily: "inherit", cursor: "pointer" } }, "Abbrechen"),
+          React.createElement("button", {
+            onClick: async () => {
+              const imports = pendingImport.savedWorkouts || [];
+              const sessions = pendingImport.history || [];
+              const badges = pendingImport.unlockedBadges || [];
+              let ok = 0, fail = 0;
+              for (const w of imports) {
+                try {
+                  const payload = { name: w.name, config_rounds: w.config?.rounds || 1, config_rest_between_rounds: w.config?.restBetweenRounds || 60, config_countdown_sec: w.config?.countdownSec || 20, config_youtube_url: w.config?.youtubeUrl || "", exercises: (w.config?.items || []).map((item, i) => ({ position: i, type: item.type, name: item.name || null, duration_sec: item.type === "exercise" ? item.workSec : item.durationSec, rest_sec: item.restSec || 0, sets: item.sets || 1, half_time_signal: item.halfTimeSignal || false, legacy_id: item._id || null })) };
+                  const saved = await apiRequest("POST", "/workouts", payload);
+                  setSavedWorkouts(prev => [...prev, { id: saved.id, name: w.name, createdAt: new Date().toLocaleDateString("de-DE"), config: { ...w.config, _name: w.name } }]);
+                  ok++;
+                } catch { fail++; }
+              }
+              for (const s of sessions) { await apiRequest("POST", "/sessions", { workout_name: s.name, duration_sec: s.durationSec || 0, sets_done: s.exercises || 0, rounds_done: s.rounds || 1 }).catch(() => {}); }
+              for (const b of badges) { await apiRequest("POST", "/badges", { badge_id: typeof b === "string" ? b : b.badge_id }).catch(() => {}); }
+              setPendingImport(null);
+              alert("Migration abgeschlossen! " + ok + " Workouts importiert" + (fail > 0 ? ", " + fail + " fehlgeschlagen" : "") + ".");
+              window.location.reload();
+            },
+            style: { flex: 2, padding: "12px", borderRadius: 10, border: "none", background: "#22c55e", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
+          }, "✓ Importieren")
+        )
+      ),
+      // Migration banner
       (() => {
         const hasLocal = localStorage.getItem("fitness-timer-workouts-v3");
         if (!hasLocal) return null;
