@@ -520,6 +520,36 @@ function buildWeekStats(history){
 
 
 // ── FitnessTimer (Main App) ───────────────────────────────────────────────────
+
+function InviteSection({ S }) {
+  const [inviteData, setInviteData] = React.useState(null);
+  const [copied, setCopied] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const loadInvite = async () => {
+    setLoading(true);
+    try { const data = await apiRequest("GET", "/referrals/code"); setInviteData(data); }
+    catch(e) { console.error(e); }
+    finally { setLoading(false); }
+  };
+  const inviteUrl = inviteData ? "https://app.intervallcoach.de/?ref=" + inviteData.code : "";
+  const handleShare = async () => {
+    if (navigator.share) { try { await navigator.share({ title: "Intervall & Tabata Coach", text: "Trainiere mit mir - kostenlos:", url: inviteUrl }); } catch {} }
+    else { navigator.clipboard.writeText(inviteUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); }
+  };
+  return React.createElement("div", { style: { ...S.card, padding: "20px" } },
+    React.createElement("div", { style: { fontSize: 13, letterSpacing: 3, textTransform: "uppercase", marginBottom: 14, ...S.text3 } }, "Freund einladen"),
+    inviteData
+      ? React.createElement(React.Fragment, null,
+          inviteData.count > 0 && React.createElement("div", { style: { fontSize: 13, color: "#22c55e", marginBottom: 12 } }, inviteData.count, " Freund", inviteData.count > 1 ? "e" : "", " eingeladen"),
+          React.createElement("div", { style: { background: "var(--bg4)", border: "1px solid var(--border)", borderRadius: 4, padding: "12px 14px", fontSize: 13, color: "var(--text3)", marginBottom: 12, wordBreak: "break-all", fontFamily: "monospace" } }, inviteUrl),
+          React.createElement("button", { onClick: handleShare, style: { width: "100%", padding: "12px", borderRadius: 4, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" } }, copied ? "Link kopiert!" : "Einladungslink teilen")
+        )
+      : React.createElement("button", { onClick: loadInvite, disabled: loading, style: { width: "100%", padding: "12px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg3)", color: "var(--text2)", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" } }, loading ? "..." : "Einladungslink generieren")
+  );
+}
+
+
+
 const { useState, useEffect, useRef, useCallback } = React;
 
 function FitnessTimer({ user, onLogout }) {
@@ -1001,7 +1031,8 @@ function FitnessTimer({ user, onLogout }) {
       for (const s of lsHistory) {
         await apiRequest("POST", "/sessions", {
           workout_name: s.name, duration_sec: s.durationSec || 0,
-          sets_done: s.exercises || 0, rounds_done: s.rounds || 1
+          sets_done: s.exercises || 0, rounds_done: s.rounds || 1,
+          completed_at_str: (s.date && s.time) ? s.date + " " + s.time : null
         }).catch(() => {});
       }
       for (const b of lsBadges) {
@@ -1361,13 +1392,30 @@ function FitnessTimer({ user, onLogout }) {
               let ok = 0, fail = 0;
               for (const w of imports) {
                 try {
-                  const payload = { name: w.name, config_rounds: w.config?.rounds || 1, config_rest_between_rounds: w.config?.restBetweenRounds || 60, config_countdown_sec: w.config?.countdownSec || 20, config_youtube_url: w.config?.youtubeUrl || "", exercises: (w.config?.items || []).map((item, i) => ({ position: i, type: item.type, name: item.name || null, duration_sec: item.type === "exercise" ? item.workSec : item.durationSec, rest_sec: item.restSec || 0, sets: item.sets || 1, half_time_signal: item.halfTimeSignal || false, legacy_id: item._id || null })) };
+                  const cfg = w.config || {};
+                  const payload = {
+                    name: w.name,
+                    config_rounds: cfg.rounds || 1,
+                    config_rest_between_rounds: cfg.restBetweenRounds || 60,
+                    config_countdown_sec: cfg.countdownSec || 20,
+                    config_youtube_url: cfg.youtubeUrl || "",
+                    exercises: (cfg.items || []).map((item, i) => ({
+                      position: i,
+                      type: item.type,
+                      name: item.name || null,
+                      duration_sec: item.type === "exercise" ? (item.workSec || item.duration_sec || 20) : (item.durationSec || item.duration_sec || 30),
+                      rest_sec: item.restSec || item.rest_sec || 0,
+                      sets: item.sets || 1,
+                      half_time_signal: item.halfTimeSignal || item.half_time_signal || false,
+                      legacy_id: item._id || null
+                    }))
+                  };
                   const saved = await apiRequest("POST", "/workouts", payload);
-                  setSavedWorkouts(prev => [...prev, { id: saved.id, name: w.name, createdAt: new Date().toLocaleDateString("de-DE"), config: { ...w.config, _name: w.name } }]);
+                  setSavedWorkouts(prev => [...prev, { id: saved.id, name: w.name, createdAt: new Date().toLocaleDateString("de-DE"), config: { ...cfg, _name: w.name, rounds: cfg.rounds || 1 } }]);
                   ok++;
                 } catch { fail++; }
               }
-              for (const s of sessions) { await apiRequest("POST", "/sessions", { workout_name: s.name, duration_sec: s.durationSec || 0, sets_done: s.exercises || 0, rounds_done: s.rounds || 1 }).catch(() => {}); }
+              for (const s of sessions) { await apiRequest("POST", "/sessions", { workout_name: s.name, duration_sec: s.durationSec || 0, sets_done: s.exercises || 0, rounds_done: s.rounds || 1, completed_at_str: (s.date && s.time) ? s.date + " " + s.time : null }).catch(() => {}); }
               for (const b of badges) { await apiRequest("POST", "/badges", { badge_id: typeof b === "string" ? b : b.badge_id }).catch(() => {}); }
               setPendingImport(null);
               alert("Migration abgeschlossen! " + ok + " Workouts importiert" + (fail > 0 ? ", " + fail + " fehlgeschlagen" : "") + ".");
@@ -1444,6 +1492,36 @@ function FitnessTimer({ user, onLogout }) {
               React.createElement("div", { style: { fontSize: 14, letterSpacing: 3, textTransform: "uppercase", ...S.text3 } }, history.length, " Trainings"),
               React.createElement("div", { style: { fontSize: 13, ...S.text3 } }, user.name || user.email)
             ),
+            // ── Statistik-Kacheln ──────────────────────────────────────────────
+            (() => {
+              const totalSec = history.reduce((s, h) => s + (h.durationSec || 0), 0);
+              const weeks = {};
+              history.forEach(h => {
+                const d = parseDeDate(h.date);
+                if (!d) return;
+                const week = Math.floor((d - new Date(d.getFullYear(), 0, 1)) / 604800000);
+                const key = d.getFullYear() + "-" + week;
+                weeks[key] = (weeks[key] || 0) + 1;
+              });
+              const avgPerWeek = Object.keys(weeks).length > 0 ? (history.length / Object.keys(weeks).length).toFixed(1) : 0;
+              const stats = [
+                { icon: "\uD83C\uDFCB\uFE0F", label: "Trainings", value: history.length },
+                { icon: "\u23F1", label: "Gesamtzeit", value: fmtTime(totalSec) },
+                { icon: "\uD83D\uDCC5", label: "\u00D8 / Woche", value: avgPerWeek },
+                { icon: "\uD83D\uDD25", label: "Beste Streak", value: calcLongestStreak(history) + " Tage" }
+              ];
+              return React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 4 } },
+                stats.map(s => React.createElement("div", { key: s.label, style: { ...S.card, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12 } },
+                  React.createElement("div", { style: { fontSize: 24 } }, s.icon),
+                  React.createElement("div", null,
+                    React.createElement("div", { style: { fontSize: 18, fontWeight: 800, ...S.text } }, s.value),
+                    React.createElement("div", { style: { fontSize: 11, letterSpacing: 1, textTransform: "uppercase", ...S.text4 } }, s.label)
+                  )
+                ))
+              );
+            })(),
+
+            // ── 7-Tage-Übersicht ──────────────────────────────────────────────
             (() => {
               const weekStats = buildWeekStats(history);
               const maxSec = Math.max(...weekStats.map(d => d.totalSec), 60);
@@ -1465,6 +1543,95 @@ function FitnessTimer({ user, onLogout }) {
                 )
               );
             })(),
+            // ── Monatsansicht ─────────────────────────────────────────────────
+            (() => {
+              const today = new Date();
+              today.setHours(0,0,0,0);
+              const year = today.getFullYear();
+              const month = today.getMonth();
+              const firstDay = new Date(year, month, 1);
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const startOffset = (firstDay.getDay() + 6) % 7; // Mo=0
+              const monthNames = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+              const trainedDays = new Set();
+              history.forEach(h => {
+                const d = parseDeDate(h.date);
+                if (d && d.getFullYear() === year && d.getMonth() === month) trainedDays.add(d.getDate());
+              });
+              const days = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+              const cells = [];
+              for (let i = 0; i < startOffset; i++) cells.push(null);
+              for (let i = 1; i <= daysInMonth; i++) cells.push(i);
+              return React.createElement("div", { style: { ...S.card, padding: "16px", marginBottom: 4 } },
+                React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 } },
+                  React.createElement("div", { style: { fontSize: 14, letterSpacing: 3, textTransform: "uppercase", ...S.text3 } }, "Monatsansicht"),
+                  React.createElement("div", { style: { fontSize: 13, ...S.text3 } }, monthNames[month], " ", year)
+                ),
+                React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 8 } },
+                  days.map(d => React.createElement("div", { key: d, style: { textAlign: "center", fontSize: 11, fontWeight: 700, ...S.text4, letterSpacing: 1 } }, d))
+                ),
+                React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 } },
+                  cells.map((day, i) => {
+                    if (!day) return React.createElement("div", { key: "e"+i });
+                    const isToday = day === today.getDate();
+                    const trained = trainedDays.has(day);
+                    return React.createElement("div", { key: day, style: {
+                      aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center",
+                      borderRadius: 4, fontSize: 12, fontWeight: isToday ? 800 : 400,
+                      background: trained ? "#f97316" : isToday ? "var(--bg3)" : "transparent",
+                      color: trained ? "#fff" : isToday ? "var(--text)" : "var(--text4)",
+                      border: isToday && !trained ? "1px solid var(--border)" : "none"
+                    } }, day);
+                  })
+                )
+              );
+            })(),
+
+            // ── 8-Wochen-Trend ────────────────────────────────────────────────
+            (() => {
+              const today = new Date();
+              today.setHours(0,0,0,0);
+              const weeks = [];
+              for (let w = 7; w >= 0; w--) {
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay() + 1 - w * 7);
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                const entries = history.filter(h => {
+                  const d = parseDeDate(h.date);
+                  return d && d >= weekStart && d <= weekEnd;
+                });
+                const totalSec = entries.reduce((s, h) => s + (h.durationSec || 0), 0);
+                const label = "KW" + Math.ceil((weekStart - new Date(weekStart.getFullYear(), 0, 1)) / 604800000);
+                weeks.push({ label, totalSec, count: entries.length, isCurrent: w === 0 });
+              }
+              const maxSec = Math.max(...weeks.map(w => w.totalSec), 60);
+              const totalAllSec = weeks.reduce((s, w) => s + w.totalSec, 0);
+              return React.createElement("div", { style: { ...S.card, padding: "16px", marginBottom: 4 } },
+                React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 } },
+                  React.createElement("div", { style: { fontSize: 14, letterSpacing: 3, textTransform: "uppercase", ...S.text3 } }, "8-Wochen-Trend"),
+                  React.createElement("div", { style: { fontSize: 13, ...S.text3 } }, fmtTime(totalAllSec), " gesamt")
+                ),
+                React.createElement("div", { style: { display: "flex", alignItems: "flex-end", gap: 6, height: 100 } },
+                  weeks.map((w, i) =>
+                    React.createElement("div", { key: i, style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, height: "100%", justifyContent: "flex-end" } },
+                      w.totalSec > 0 && React.createElement("div", { style: { fontSize: 9, fontWeight: 700, color: w.isCurrent ? "#f97316" : "var(--text3)", whiteSpace: "nowrap" } },
+                        Math.round(w.totalSec / 60), "m"
+                      ),
+                      React.createElement("div", { style: {
+                        width: "100%", borderRadius: 4, minHeight: 4,
+                        height: (Math.max((w.totalSec / maxSec) * 100, w.totalSec > 0 ? 8 : 0)) + "%",
+                        background: w.totalSec === 0 ? "var(--bg3)" : w.isCurrent ? "#f97316" : "var(--text3)",
+                        border: w.totalSec === 0 ? "1px dashed var(--border)" : "none",
+                        transition: "height 0.5s cubic-bezier(.34,1.3,.64,1)"
+                      } }),
+                      React.createElement("div", { style: { fontSize: 9, fontWeight: w.isCurrent ? 800 : 400, color: w.isCurrent ? "#f97316" : "var(--text4)", whiteSpace: "nowrap" } }, w.label)
+                    )
+                  )
+                )
+              );
+            })(),
+
             (() => {
               const longestStreak = calcLongestStreak(history);
               const unlockedSet = new Set(unlockedBadges);
@@ -1560,6 +1727,11 @@ function FitnessTimer({ user, onLogout }) {
           style: { width: "100%", padding: "12px", borderRadius: 4, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }
         }, profileLoading ? "..." : "Passwort aendern")
       ),
+      // Invite
+      React.createElement(InviteSection, { S }),
+
+      
+
       // Logout
       React.createElement("button", {
         onClick: onLogout,

@@ -1,9 +1,5 @@
-// Tabata & Intervall Trainer — Service Worker
-const CACHE = "tabata-v4";
-
+const CACHE = "intervallcoach-v1";
 const ASSETS = [
-  "/",
-  "/index.html",
   "/manifest.json",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
@@ -28,22 +24,27 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   if (e.request.url.startsWith("chrome-extension")) return;
-
   const url = new URL(e.request.url);
-  if (url.hostname !== location.hostname) return;
 
+  // index.html und API immer vom Netzwerk
+  if (url.pathname === "/" || url.pathname === "/index.html" || url.pathname.startsWith("/api/")) {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match("/index.html"))
+    );
+    return;
+  }
+
+  // Alles andere: Cache first
+  if (url.hostname !== location.hostname) return;
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
       return fetch(e.request).then(response => {
         if (response && response.status === 200 && response.type !== "opaque") {
-          const clone = response.clone();
-          caches.open(CACHE).then(cache => cache.put(e.request, clone));
+          caches.open(CACHE).then(cache => cache.put(e.request, response.clone()));
         }
         return response;
-      }).catch(() => {
-        if (e.request.mode === "navigate") return caches.match("/index.html");
-      });
+      }).catch(() => caches.match("/index.html"));
     })
   );
 });
