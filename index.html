@@ -596,7 +596,7 @@ function FitnessTimer({ user, onLogout }) {
     const importToken = new URLSearchParams(window.location.search).get('import');
     if (importToken) {
       window.history.replaceState({}, '', '/');
-      try {
+      (async () => { try {
         const w = await apiRequest('GET', '/workouts/shared/' + importToken);
         const cfg = {
           rounds: w.config_rounds || 1, restBetweenRounds: w.config_rest_between_rounds || 60,
@@ -619,7 +619,7 @@ function FitnessTimer({ user, onLogout }) {
         };
         const saved = await apiRequest('POST', '/workouts', payload);
         alert('Workout "' + w.name + '" wurde importiert!');
-      } catch(e) { console.error('Import error:', e); }
+      } catch(e) { console.error('Import error:', e); } })();
     }
 
     async function loadData() {
