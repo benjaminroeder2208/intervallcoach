@@ -466,6 +466,19 @@ const BADGES = [
 ];
 function checkNewBadges(history, unlockedIds){ const unlockedSet = new Set(unlockedIds); return BADGES.filter(b => !unlockedSet.has(b.id) && b.check(history)); }
 
+// ── Silent Audio Loop ─────────────────────────────────────────────────────────
+let _silentLoop = null;
+function startSilentLoop(ctx) {
+  if (_silentLoop) return;
+  const buf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+  function loop() { if (!_silentLoop) return; const src = ctx.createBufferSource(); src.buffer = buf; src.connect(ctx.destination); src.onended = loop; src.start(); _silentLoop = src; }
+  _silentLoop = true; loop();
+}
+function stopSilentLoop() {
+  if (_silentLoop && _silentLoop !== true) { try { _silentLoop.onended = null; _silentLoop.stop(); } catch {} }
+  _silentLoop = null;
+}
+
 function speak(text){
   if(!window.speechSynthesis)return;
   if(window._fitTimerMuted)return;
@@ -828,7 +841,7 @@ function FitnessTimer({ user, onLogout }) {
               });
               workoutStartRef.current = null;
             }
-            stopTimer(); return;
+            stopSilentLoop(); stopTimer(); return;
           }
         }
       } else { setTimeLeft(next); }
@@ -847,7 +860,7 @@ function FitnessTimer({ user, onLogout }) {
   }, [applyTransition, getAudioCtx, stopTimer]);
 
   const handleStart = useCallback(async () => {
-    getAudioCtx(); await acquireWakeLock();
+    const ctx = getAudioCtx(); await acquireWakeLock(); startSilentLoop(ctx);
     setRound(1); setSeqIdx(0); setExSet(1); setIsPaused(false);
     setPhase(PHASES.COUNTDOWN); setTimeLeft(config.countdownSec); startTick();
     workoutStartRef.current = Date.now();
@@ -860,7 +873,7 @@ function FitnessTimer({ user, onLogout }) {
   }, []);
 
   const handleReset = useCallback(() => {
-    stopTimer(); releaseWakeLock();
+    stopTimer(); releaseWakeLock(); stopSilentLoop();
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     setPhase(PHASES.IDLE); setRound(1); setSeqIdx(0); setExSet(1); setTimeLeft(0); setIsPaused(false);
     workoutStartRef.current = null; document.title = "Intervall & Tabata Coach";
