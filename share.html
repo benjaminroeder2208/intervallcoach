@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<title>Workout teilen – Intervall & Tabata Coach</title>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#050508"/>
+<link rel="apple-touch-icon" href="/icons/icon-192.png"/>
+<link rel="icon" type="image/png" href="/icons/icon-192.png"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;padding:0;font-family:'Courier New',monospace;background:#050508;color:#fff;min-height:100vh;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .wrap{animation:fadeIn 0.35s ease;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const token = window.location.pathname.split('/w/')[1];
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtTime(s){ return pad(Math.floor(s/60)) + ':' + pad(s%60); }
+function totalWorkoutSec(cfg) {
+  const items = cfg.items || [];
+  const perRound = items.reduce((s, ex) => {
+    if (ex.type === 'exercise') return s + (ex.workSec||ex.duration_sec||0) * (ex.sets||1) + (ex.sets-1) * (ex.restSec||ex.rest_sec||0);
+    return s + (ex.durationSec||ex.duration_sec||0);
+  }, 0);
+  return perRound * (cfg.rounds||1) + (cfg.rounds-1) * (cfg.restBetweenRounds||cfg.config_rest_between_rounds||60);
+}
+
+function App() {
+  const [workout, setWorkout] = React.useState(null);
+  const [error, setError] = React.useState('');
+  const [loading, setLoading] = React.useState(true);
+  const [importing, setImporting] = React.useState(false);
+  const [imported, setImported] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!token) { setError('Kein Workout-Token gefunden.'); setLoading(false); return; }
+    fetch('/api/workouts/shared/' + token)
+      .then(r => r.ok ? r.json() : Promise.reject('Nicht gefunden'))
+      .then(data => { setWorkout(data); setLoading(false); })
+      .catch(() => { setError('Workout nicht gefunden oder Link ungültig.'); setLoading(false); });
+  }, []);
+
+  const cfg = workout ? {
+    rounds: workout.config_rounds || 1,
+    restBetweenRounds: workout.config_rest_between_rounds || 60,
+    countdownSec: workout.config_countdown_sec || 20,
+    items: (workout.exercises || []).map(ex => ({
+      type: ex.type, name: ex.name || '', workSec: ex.duration_sec, restSec: ex.rest_sec || 0,
+      sets: ex.sets || 1, durationSec: ex.duration_sec, halfTimeSignal: ex.half_time_signal
+    }))
+  } : null;
+
+  const handleImport = () => {
+    const params = new URLSearchParams({ import_token: token });
+    window.location.href = '/?import=' + token;
+  };
+
+  const S = {
+    card: { background: '#0f0f18', border: '1px solid #2a2a42', borderRadius: 4 }
+  };
+
+  if (loading) return React.createElement('div', { style: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666688', fontSize: 14, letterSpacing: 2 } }, 'LADEN...');
+
+  if (error) return React.createElement('div', { style: { minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20, gap: 16 } },
+    React.createElement('div', { style: { fontSize: 40 } }, '❌'),
+    React.createElement('div', { style: { fontSize: 16, color: '#f97316', textAlign: 'center' } }, error),
+    React.createElement('a', { href: '/', style: { color: '#9999bb', fontSize: 14 } }, '→ Zur App')
+  );
+
+  const exercises = (cfg.items || []).filter(x => x.type === 'exercise');
+  const totalSec = totalWorkoutSec(cfg);
+
+  return React.createElement('div', { className: 'wrap', style: { maxWidth: 480, margin: '0 auto', padding: '24px 20px 60px' } },
+    // Header
+    React.createElement('div', { style: { marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' } },
+      React.createElement('div', null,
+        React.createElement('div', { style: { fontSize: 12, letterSpacing: 3, textTransform: 'uppercase', color: '#666688', marginBottom: 4 } }, 'Intervall & Tabata'),
+        React.createElement('div', { style: { fontSize: 20, fontWeight: 800, color: '#fff' } }, 'COACH')
+      ),
+      React.createElement('a', { href: '/', style: { fontSize: 13, color: '#9999bb', textDecoration: 'none', padding: '6px 12px', border: '1px solid #2a2a42', borderRadius: 4 } }, '→ Zur App')
+    ),
+
+    // Workout card
+    React.createElement('div', { style: { ...S.card, padding: 20, marginBottom: 16 } },
+      React.createElement('div', { style: { fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 8 } }, workout.name),
+      React.createElement('div', { style: { display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap' } },
+        [
+          ['🔁', cfg.rounds + ' Runden'],
+          ['⏱', fmtTime(totalSec) + ' gesamt'],
+          ['🏋️', exercises.length + ' Übungen'],
+          ['💤', cfg.restBetweenRounds + 's Pause'],
+        ].map(([icon, label]) => React.createElement('div', { key: label, style: { fontSize: 13, color: '#9999bb', display: 'flex', alignItems: 'center', gap: 4 } },
+          React.createElement('span', null, icon), React.createElement('span', null, label)
+        ))
+      ),
+      // Exercise list
+      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } },
+        cfg.items.map((item, i) => {
+          if (item.type === 'break') return React.createElement('div', { key: i, style: { padding: '6px 12px', borderRadius: 4, border: '1px dashed #2a2a42', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+            React.createElement('span', { style: { fontSize: 11, color: '#666688', letterSpacing: 1 } }, '— PAUSE —'),
+            React.createElement('span', { style: { fontSize: 11, color: '#a855f7' } }, item.durationSec + 's')
+          );
+          return React.createElement('div', { key: i, style: { padding: '10px 14px', borderRadius: 4, background: '#1c1c30', border: '1px solid #2a2a42', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+            React.createElement('div', { style: { fontSize: 15, fontWeight: 700, color: '#fff' } }, item.name),
+            React.createElement('div', { style: { fontSize: 13, color: '#f97316', fontWeight: 700 } }, item.workSec + 's × ' + item.sets)
+          );
+        })
+      )
+    ),
+
+    // CTA
+    React.createElement('button', {
+      onClick: handleImport,
+      style: { width: '100%', padding: 18, borderRadius: 4, border: 'none', background: '#f97316', color: '#fff', fontSize: 16, fontWeight: 800, fontFamily: 'inherit', cursor: 'pointer', letterSpacing: 1 }
+    }, imported ? '✓ Importiert!' : '💾 In meinen Account speichern'),
+
+    React.createElement('div', { style: { textAlign: 'center', marginTop: 12, fontSize: 13, color: '#666688' } }, 'Kostenloses Konto erforderlich')
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>

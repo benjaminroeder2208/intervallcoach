@@ -592,6 +592,36 @@ function FitnessTimer({ user, onLogout }) {
 
   // Load all data from API on mount
   useEffect(() => {
+    // Handle shared workout import
+    const importToken = new URLSearchParams(window.location.search).get('import');
+    if (importToken) {
+      window.history.replaceState({}, '', '/');
+      try {
+        const w = await apiRequest('GET', '/workouts/shared/' + importToken);
+        const cfg = {
+          rounds: w.config_rounds || 1, restBetweenRounds: w.config_rest_between_rounds || 60,
+          countdownSec: w.config_countdown_sec || 20, youtubeUrl: w.config_youtube_url || '',
+          items: (w.exercises || []).map((ex, i) => ({
+            _id: 'item-' + Date.now() + '-' + i, type: ex.type, name: ex.name || '',
+            workSec: ex.duration_sec, restSec: ex.rest_sec || 0, sets: ex.sets || 1,
+            durationSec: ex.duration_sec, halfTimeSignal: ex.half_time_signal || false
+          }))
+        };
+        const payload = {
+          name: w.name, config_rounds: cfg.rounds, config_rest_between_rounds: cfg.restBetweenRounds,
+          config_countdown_sec: cfg.countdownSec, config_youtube_url: cfg.youtubeUrl,
+          exercises: cfg.items.map((item, i) => ({
+            position: i, type: item.type, name: item.name || null,
+            duration_sec: item.type === 'exercise' ? item.workSec : item.durationSec,
+            rest_sec: item.restSec || 0, sets: item.sets || 1,
+            half_time_signal: item.halfTimeSignal || false, legacy_id: null
+          }))
+        };
+        const saved = await apiRequest('POST', '/workouts', payload);
+        alert('Workout "' + w.name + '" wurde importiert!');
+      } catch(e) { console.error('Import error:', e); }
+    }
+
     async function loadData() {
       try {
         const [workouts, sessions, badges] = await Promise.all([
@@ -974,6 +1004,14 @@ function FitnessTimer({ user, onLogout }) {
     } catch (e) { showSync("error"); alert("Fehler: " + e.message); }
   };
 
+  const handleShareWorkout = async w => {
+    try {
+      const data = await apiRequest("POST", "/workouts/" + w.id + "/share", {});
+      setSavedWorkouts(prev => prev.map(x => x.id === w.id ? { ...x, share_token: data.token } : x));
+      if (navigator.share) { await navigator.share({ title: w.name, text: "Schau dir mein Workout an:", url: data.url }); }
+      else { navigator.clipboard.writeText(data.url); alert("Link kopiert: " + data.url); }
+    } catch(e) { alert("Fehler: " + e.message); }
+  };
   const handleUseWorkout = w => {
     const cfg = { ...w.config, items: w.config.items.map(i => ({ ...i })) };
     setConfig(cfg); setActiveWorkoutName(w.name); handleReset(); setTab("timer");
@@ -1481,6 +1519,7 @@ function FitnessTimer({ user, onLogout }) {
             React.createElement("div", { style: { display: "flex", gap: 8 } },
               React.createElement("button", { onClick: () => handleLoadWorkout(w), style: { flex: 1, padding: "12px", borderRadius: 4, border: "2px solid #a855f7", background: "transparent", color: "#a855f7", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "✏️ Bearbeiten"),
               React.createElement("button", { onClick: () => handleDuplicateWorkout(w), title: "Duplizieren", style: { padding: "12px 14px", borderRadius: 4, border: "1px solid var(--border)", background: "var(--bg3)", color: "var(--text3)", fontSize: 16, fontFamily: "inherit", cursor: "pointer", flexShrink: 0 } }, "⊙"),
+              React.createElement("button", { onClick: () => handleShareWorkout(w), title: "Teilen", style: { padding: "12px 14px", borderRadius: 4, border: w.share_token ? "1px solid #22c55e44" : "1px solid var(--border)", background: w.share_token ? "#22c55e22" : "var(--bg3)", color: w.share_token ? "#22c55e" : "var(--text3)", fontSize: 16, fontFamily: "inherit", cursor: "pointer", flexShrink: 0 } }, "🔗"),
               React.createElement("button", { onClick: () => handleUseWorkout(w), style: { flex: 2, padding: "12px", borderRadius: 4, border: "none", background: "#f97316", color: "#fff", fontSize: 14, fontFamily: "inherit", cursor: "pointer", fontWeight: 700 } }, "▶ Direkt starten")
             ),
             confirmDelete === w.id && React.createElement("div", { style: { marginTop: 12, padding: "14px", background: "var(--del-bg)", borderRadius: 4, border: "1px solid var(--del-border)" } },
